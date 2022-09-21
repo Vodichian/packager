@@ -20,4 +20,9 @@ public class InnoTool extends AbstractTool {
     void execute() {
 
     }
+
+    @Override
+    public void load(ToolSettings settings) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
 }

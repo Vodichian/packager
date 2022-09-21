@@ -1,7 +1,5 @@
 package com.vodichian.packager.tool;
 
-import javafx.scene.control.TextField;
-
 import java.io.File;
 import java.util.Optional;
 
@@ -34,5 +32,10 @@ public class Launch4jTool extends AbstractTool {
     @Override
     void execute() {
 
+    }
+
+    @Override
+    public void load(ToolSettings settings) {
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 }

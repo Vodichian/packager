@@ -11,8 +11,8 @@ import java.util.Optional;
 public abstract class AbstractTool {
     private final ReadOnlyBooleanWrapper validPathToTool = new ReadOnlyBooleanWrapper(false);
     private final ReadOnlyBooleanWrapper validConfiguration = new ReadOnlyBooleanWrapper(false);
-    private ReadOnlyObjectWrapper<File> toolWrapper = new ReadOnlyObjectWrapper<>();
-    private ReadOnlyObjectWrapper<File> configWrapper = new ReadOnlyObjectWrapper<>();
+    private final ReadOnlyObjectWrapper<File> toolWrapper = new ReadOnlyObjectWrapper<>();
+    private final ReadOnlyObjectWrapper<File> configWrapper = new ReadOnlyObjectWrapper<>();
 
     protected AbstractTool() {
     }
@@ -57,4 +57,5 @@ public abstract class AbstractTool {
                 .map(f -> f.substring(filename.lastIndexOf(".") + 1));
     }
 
+    abstract public void load(ToolSettings settings);
 }
