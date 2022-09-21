@@ -14,18 +14,23 @@ public abstract class AbstractTool {
     private final ReadOnlyObjectWrapper<File> toolWrapper = new ReadOnlyObjectWrapper<>();
     private final ReadOnlyObjectWrapper<File> configWrapper = new ReadOnlyObjectWrapper<>();
 
-    protected AbstractTool() {
+    private ToolSettings settings;
+
+    protected AbstractTool(ToolSettings settings) {
+        this.settings = settings;
     }
 
     public boolean setTool(File tool) {
         validPathToTool.set(validateTool(tool));
         toolWrapper.set(tool);
+        settings.setToolLocation(tool);
         return validPathToTool.get();
     }
 
     public boolean setConfiguration(File configuration) {
         configWrapper.set(configuration);
         validConfiguration.set(validateConfiguration(configuration));
+        settings.setConfiguration(configuration);
         return validConfiguration.get();
     }
 
@@ -57,5 +62,8 @@ public abstract class AbstractTool {
                 .map(f -> f.substring(filename.lastIndexOf(".") + 1));
     }
 
-    abstract public void load(ToolSettings settings);
+    public ToolSettings getSettings() {
+        return settings;
+    }
+
 }

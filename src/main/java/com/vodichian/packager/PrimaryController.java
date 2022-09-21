@@ -3,6 +3,7 @@ package com.vodichian.packager;
 import com.vodichian.packager.tool.AbstractTool;
 import com.vodichian.packager.tool.InnoTool;
 import com.vodichian.packager.tool.Launch4jTool;
+import com.vodichian.packager.tool.ToolSettings;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
@@ -42,8 +43,8 @@ public class PrimaryController {
 
     @FXML
     private void initialize() {
-        launch4jTool = new Launch4jTool();
-        innoTool = new InnoTool();
+        launch4jTool = new Launch4jTool(new ToolSettings());
+        innoTool = new InnoTool(new ToolSettings());
 
         setSphereColor(launch4jSphere, Color.RED);
         setSphereColor(innoSphere, Color.RED);

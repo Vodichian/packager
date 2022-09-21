@@ -3,7 +3,8 @@ package com.vodichian.packager.tool;
 import java.io.File;
 
 public class InnoTool extends AbstractTool {
-    public InnoTool() {
+    public InnoTool(ToolSettings settings) {
+        super(settings);
     }
 
     @Override
@@ -19,10 +20,5 @@ public class InnoTool extends AbstractTool {
     @Override
     void execute() {
 
-    }
-
-    @Override
-    public void load(ToolSettings settings) {
-        throw new UnsupportedOperationException("Not yet implemented");
     }
 }

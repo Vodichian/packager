@@ -11,16 +11,15 @@ public class ToolFactory {
         AbstractTool tool;
         switch (settings.getName()) {
             case LAUNCH_4_J:
-                tool = new Launch4jTool();
+                tool = new Launch4jTool(settings);
                 break;
             case INNO_SETUP:
-                tool = new InnoTool();
+                tool = new InnoTool(settings);
                 break;
             default: {
                 throw new PackagerException("Unsupported tool: " + settings.getName());
             }
         }
-        tool.load(settings);
         return tool;
     }
 }

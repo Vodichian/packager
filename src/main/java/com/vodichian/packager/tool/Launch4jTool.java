@@ -4,7 +4,8 @@ import java.io.File;
 import java.util.Optional;
 
 public class Launch4jTool extends AbstractTool {
-    public Launch4jTool() {
+    public Launch4jTool(ToolSettings settings) {
+        super(settings);
     }
 
     @Override
@@ -34,8 +35,4 @@ public class Launch4jTool extends AbstractTool {
 
     }
 
-    @Override
-    public void load(ToolSettings settings) {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
 }
