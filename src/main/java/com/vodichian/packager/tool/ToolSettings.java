@@ -35,8 +35,8 @@ public class ToolSettings {
         final PrintWriter writer = new PrintWriter(new FileWriter(file));
         writer.println("# ToolSettings");
         writer.printf(NAME_TAG + "%s\n", name);
-        writer.printf(TOOL_TAG + "%s\n", toolLocation.getAbsolutePath());
-        writer.printf(CONFIG_TAG + "%s", configuration.getAbsolutePath());
+        writer.printf(TOOL_TAG + "%s\n", (toolLocation == null) ? "" : toolLocation.getAbsolutePath());
+        writer.printf(CONFIG_TAG + "%s", (configuration == null) ? "" : configuration.getAbsolutePath());
         writer.close();
     }
 

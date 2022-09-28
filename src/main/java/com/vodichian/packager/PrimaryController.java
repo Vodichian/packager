@@ -1,9 +1,6 @@
 package com.vodichian.packager;
 
-import com.vodichian.packager.tool.AbstractTool;
-import com.vodichian.packager.tool.InnoTool;
-import com.vodichian.packager.tool.Launch4jTool;
-import com.vodichian.packager.tool.ToolSettings;
+import com.vodichian.packager.tool.*;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;

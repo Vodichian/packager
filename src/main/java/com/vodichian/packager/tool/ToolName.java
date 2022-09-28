@@ -6,4 +6,6 @@ package com.vodichian.packager.tool;
 public enum ToolName {
     INNO_SETUP,
     LAUNCH_4_J,
+
+    BUILD_EXTRACTOR,
 }

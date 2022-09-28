@@ -1,7 +1,15 @@
 package com.vodichian.packager.tool;
 
 import com.vodichian.packager.PackagerException;
+import com.vodichian.packager.Utils;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.stream.Stream;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
@@ -25,6 +33,70 @@ public class ToolFactoryTest {
             assertEquals(tool.getClass(), InnoTool.class);
         } catch (PackagerException e) {
             fail("Exception was thrown, e");
+        }
+    }
+
+    @Test
+    public void testTools() throws PackagerException, IOException {
+        // remove existing settings, if any
+        Path toolDir = Paths.get("tools");
+        try (Stream<Path> settings = Files.list(toolDir)) {
+            settings
+                    .filter(path -> !Files.isDirectory(path))
+                    .filter(path -> Utils.getExtension(path.toFile().getName())
+                            .orElse("none").equals(ToolFactory.SETTING_EXTENSION))
+                    .forEach(path1 -> {
+                        try {
+                            Files.delete(path1);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+        }
+        try (Stream<Path> settings = Files.list(toolDir)) {
+            long size = settings
+                    .filter(path -> !Files.isDirectory(path))
+                    .filter(path -> Utils.getExtension(path.toFile().getName())
+                            .orElse("none").equals(ToolFactory.SETTING_EXTENSION))
+                    .count();
+            assertEquals(size, 0);
+        }
+
+        // ToolFactory.tools() should now create default settings and return a collection of AbstractTool
+        Collection<AbstractTool> tools = ToolFactory.tools();
+        assertEquals(tools.size(), ToolName.values().length);
+        tools.forEach(tool -> System.out.println("Tool Found: " + tool.getSettings().getName()));
+
+        try (Stream<Path> settings = Files.list(toolDir)) {
+            long size = settings
+                    .filter(path -> !Files.isDirectory(path))
+                    .filter(path -> Utils.getExtension(path.toFile().getName())
+                            .orElse("none").equals(ToolFactory.SETTING_EXTENSION))
+                    .count();
+            assertEquals(size, ToolName.values().length);
+        }
+
+        // cleanup
+        try (Stream<Path> settings = Files.list(toolDir)) {
+            settings
+                    .filter(path -> !Files.isDirectory(path))
+                    .filter(path -> Utils.getExtension(path.toFile().getName())
+                            .orElse("none").equals(ToolFactory.SETTING_EXTENSION))
+                    .forEach(path1 -> {
+                        try {
+                            Files.delete(path1);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+        }
+        try (Stream<Path> settings = Files.list(toolDir)) {
+            long size = settings
+                    .filter(path -> !Files.isDirectory(path))
+                    .filter(path -> Utils.getExtension(path.toFile().getName())
+                            .orElse("none").equals(ToolFactory.SETTING_EXTENSION))
+                    .count();
+            assertEquals(size, 0);
         }
     }
 }

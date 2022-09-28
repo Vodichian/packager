@@ -56,12 +56,6 @@ public abstract class AbstractTool {
 
     abstract void execute();
 
-    protected Optional<String> getExtension(String filename) {
-        return Optional.ofNullable(filename)
-                .filter(f -> f.contains("."))
-                .map(f -> f.substring(filename.lastIndexOf(".") + 1));
-    }
-
     public ToolSettings getSettings() {
         return settings;
     }
