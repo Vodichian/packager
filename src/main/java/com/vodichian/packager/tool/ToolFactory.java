@@ -1,7 +1,11 @@
 package com.vodichian.packager.tool;
 
+import com.vodichian.packager.App;
 import com.vodichian.packager.PackagerException;
+import com.vodichian.packager.ToolController;
 import com.vodichian.packager.Utils;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -66,10 +71,18 @@ public class ToolFactory {
     private static Collection<ToolSettings> getToolSettings(Path toolDir) throws IOException {
         try (Stream<Path> settings = Files.list(toolDir)) {
             return settings
-                    .filter(path -> !Files.isDirectory(path))
-                    .filter(path -> Utils.getExtension(path.toFile().getName())
+                    .filter(path -> !Files.isDirectory(path)) // is not a directory
+                    .filter(path -> Utils.getExtension(path.toFile().getName()) // is a settings file
                             .orElse("none").equals(SETTING_EXTENSION))
-                    .map(path -> new ToolSettings().setToolLocation(path.toFile())).collect(Collectors.toList());
+                    .map(path -> {
+                        try {
+                            ToolSettings toolSettings = new ToolSettings();
+                            toolSettings.load(path.toFile());
+                            return toolSettings;
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }).collect(Collectors.toList());
         }
     }
 
@@ -79,5 +92,23 @@ public class ToolFactory {
             Files.createDirectory(toolDir);
         }
         return toolDir;
+    }
+
+    private static Parent loadFXML(AbstractTool tool) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("tool.fxml"));
+        Parent parent = fxmlLoader.load();
+        ToolController controller = fxmlLoader.getController();
+        controller.setTool(tool);
+        return parent;
+    }
+
+    public static List<Parent> toolViews() throws PackagerException, IOException {
+        return tools().stream().map(tool -> {
+            try {
+                return loadFXML(tool);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }).collect(Collectors.toList());
     }
 }
