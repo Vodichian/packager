@@ -2,6 +2,9 @@ package com.vodichian.packager.tool;
 
 import com.vodichian.packager.PackagerException;
 import com.vodichian.packager.Utils;
+import javafx.application.Platform;
+import javafx.scene.Parent;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -9,12 +12,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Stream;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.fail;
+import static org.testng.Assert.*;
 
 public class ToolFactoryTest {
+
+    @BeforeTest
+    static void initJfxRuntime() {
+        Platform.startup(() -> {
+        });
+    }
+
 
     @Test
     public void testMake() {
@@ -98,5 +108,12 @@ public class ToolFactoryTest {
                     .count();
             assertEquals(size, 0);
         }
+    }
+
+    @Test
+    public void testToolViews() throws PackagerException, IOException {
+        List<Parent> toolViews = ToolFactory.toolViews();
+        assertNotNull(toolViews);
+        assertEquals(ToolName.values().length, toolViews.size());
     }
 }
