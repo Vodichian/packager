@@ -2,6 +2,8 @@ package com.vodichian.packager;
 
 import javafx.fxml.FXML;
 
+import java.io.IOException;
+
 public class SettingsController {
 
     @FXML
@@ -10,7 +12,11 @@ public class SettingsController {
 
     @FXML
     private void back() {
-        System.out.println("back was clicked");
+        try {
+            App.setRoot("primary");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

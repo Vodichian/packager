@@ -7,6 +7,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Sphere;
 
+import java.io.IOException;
+
 public class ToolController {
     /**
      * The {@link AbstractTool} this controller is controlling.
@@ -51,7 +53,13 @@ public class ToolController {
 
     @FXML
     private void config() {
-        System.out.println("Config was clicked");
+        // switch to settings view using this ToolSetting
+        try {
+            App.setRoot("settings");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     private void monitorToolStatus() {
