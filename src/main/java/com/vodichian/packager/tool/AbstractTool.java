@@ -11,21 +11,26 @@ import java.util.Optional;
 public abstract class AbstractTool {
     private final ReadOnlyBooleanWrapper validPathToTool = new ReadOnlyBooleanWrapper(false);
     private final ReadOnlyBooleanWrapper validConfiguration = new ReadOnlyBooleanWrapper(false);
-    private ReadOnlyObjectWrapper<File> toolWrapper = new ReadOnlyObjectWrapper<>();
-    private ReadOnlyObjectWrapper<File> configWrapper = new ReadOnlyObjectWrapper<>();
+    private final ReadOnlyObjectWrapper<File> toolWrapper = new ReadOnlyObjectWrapper<>();
+    private final ReadOnlyObjectWrapper<File> configWrapper = new ReadOnlyObjectWrapper<>();
 
-    protected AbstractTool() {
+    private ToolSettings settings;
+
+    protected AbstractTool(ToolSettings settings) {
+        this.settings = settings;
     }
 
     public boolean setTool(File tool) {
         validPathToTool.set(validateTool(tool));
         toolWrapper.set(tool);
+        settings.setToolLocation(tool);
         return validPathToTool.get();
     }
 
     public boolean setConfiguration(File configuration) {
         configWrapper.set(configuration);
         validConfiguration.set(validateConfiguration(configuration));
+        settings.setConfiguration(configuration);
         return validConfiguration.get();
     }
 
@@ -51,10 +56,8 @@ public abstract class AbstractTool {
 
     abstract void execute();
 
-    protected Optional<String> getExtension(String filename) {
-        return Optional.ofNullable(filename)
-                .filter(f -> f.contains("."))
-                .map(f -> f.substring(filename.lastIndexOf(".") + 1));
+    public ToolSettings getSettings() {
+        return settings;
     }
 
 }

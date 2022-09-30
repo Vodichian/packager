@@ -2,18 +2,18 @@ package com.vodichian.packager.tool;
 
 import java.io.File;
 
-public class InnoTool extends AbstractTool {
-    public InnoTool(ToolSettings settings) {
+public class BuildTool extends AbstractTool {
+    public BuildTool(ToolSettings settings) {
         super(settings);
     }
 
     @Override
-    protected boolean validateConfiguration(File configurationPath) {
+    protected boolean validateConfiguration(File configuration) {
         return false;
     }
 
     @Override
-    protected boolean validateTool(File tool) {
+    protected boolean validateTool(File file) {
         return false;
     }
 
