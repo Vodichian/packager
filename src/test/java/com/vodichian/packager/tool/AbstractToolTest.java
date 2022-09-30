@@ -1,9 +1,12 @@
 package com.vodichian.packager.tool;
 
+import javafx.stage.FileChooser;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
 
 import static org.testng.Assert.*;
 
@@ -30,10 +33,15 @@ public class AbstractToolTest {
         void execute() {
 
         }
+
+        @Override
+        public Collection<FileChooser.ExtensionFilter> getFilters() {
+            return null;
+        }
     };
 
     @Test
-    public void testSetTool() {
+    public void testSetTool() throws IOException {
         assertNull(abstractTool.tool().get());
         File tool = getRandomFile();
         boolean result = abstractTool.setTool(tool);
@@ -52,7 +60,7 @@ public class AbstractToolTest {
     }
 
     @Test
-    public void testSetConfiguration() {
+    public void testSetConfiguration() throws IOException {
         assertNull(abstractTool.configuration().get());
         File config = getRandomFile();
         boolean result = abstractTool.setConfiguration(config);

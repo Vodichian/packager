@@ -44,6 +44,11 @@ public class ToolFactory {
         return tool;
     }
 
+    public static void save(ToolSettings settings) throws IOException {
+        String filename = TOOL_DIRECTORY + "/" + settings.getName() + "." + SETTING_EXTENSION;
+        settings.save(new File(filename));
+    }
+
     public static Collection<AbstractTool> tools() throws IOException, PackagerException {
         // Look in tool directory for ToolSettings files for settings
         Path toolDir = getToolDirectory();
@@ -55,8 +60,7 @@ public class ToolFactory {
                     .noneMatch(settings -> settings.getName().equals(toolName));
             if (noneMatch) {
                 ToolSettings settings = new ToolSettings().setName(toolName);
-                String filename = TOOL_DIRECTORY + "/" + toolName + "." + SETTING_EXTENSION;
-                settings.save(new File(filename));
+                save(settings);
                 allSettings.add(settings);
             }
         }

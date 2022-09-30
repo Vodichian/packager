@@ -55,7 +55,7 @@ public class ToolController {
     private void config() {
         // switch to settings view using this ToolSetting
         try {
-            App.setRoot("settings");
+            App.displaySettings(tool);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
