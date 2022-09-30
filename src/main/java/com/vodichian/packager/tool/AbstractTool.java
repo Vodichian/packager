@@ -4,9 +4,11 @@ import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.stage.FileChooser;
 
 import java.io.File;
-import java.util.Optional;
+import java.io.IOException;
+import java.util.Collection;
 
 public abstract class AbstractTool {
     private final ReadOnlyBooleanWrapper validPathToTool = new ReadOnlyBooleanWrapper(false);
@@ -14,23 +16,25 @@ public abstract class AbstractTool {
     private final ReadOnlyObjectWrapper<File> toolWrapper = new ReadOnlyObjectWrapper<>();
     private final ReadOnlyObjectWrapper<File> configWrapper = new ReadOnlyObjectWrapper<>();
 
-    private ToolSettings settings;
+    private final ToolSettings settings;
 
     protected AbstractTool(ToolSettings settings) {
         this.settings = settings;
     }
 
-    public boolean setTool(File tool) {
+    public boolean setTool(File tool) throws IOException {
         validPathToTool.set(validateTool(tool));
         toolWrapper.set(tool);
         settings.setToolLocation(tool);
+        ToolFactory.save(settings);
         return validPathToTool.get();
     }
 
-    public boolean setConfiguration(File configuration) {
+    public boolean setConfiguration(File configuration) throws IOException {
         configWrapper.set(configuration);
         validConfiguration.set(validateConfiguration(configuration));
         settings.setConfiguration(configuration);
+        ToolFactory.save(settings);
         return validConfiguration.get();
     }
 
@@ -60,4 +64,8 @@ public abstract class AbstractTool {
         return settings;
     }
 
+    /**
+     * @return the file extension supported by this tool, returns empty list if none
+     */
+    public abstract Collection<FileChooser.ExtensionFilter> getFilters();
 }
