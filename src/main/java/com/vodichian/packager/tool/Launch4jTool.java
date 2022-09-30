@@ -1,17 +1,20 @@
 package com.vodichian.packager.tool;
 
-import javafx.scene.control.TextField;
+import com.vodichian.packager.Utils;
 
 import java.io.File;
 import java.util.Optional;
 
+import static com.vodichian.packager.Utils.getExtension;
+
 public class Launch4jTool extends AbstractTool {
-    public Launch4jTool() {
+    public Launch4jTool(ToolSettings settings) {
+        super(settings);
     }
 
     @Override
     protected boolean validateConfiguration(File configurationPath) {
-        Optional<String> result = getExtension(configurationPath.getName());
+        Optional<String> result = Utils.getExtension(configurationPath.getName());
         if (result.isPresent()) {
             System.out.println("result = " + result.get());
             return result.get().equals("xml");
@@ -35,4 +38,5 @@ public class Launch4jTool extends AbstractTool {
     void execute() {
 
     }
+
 }

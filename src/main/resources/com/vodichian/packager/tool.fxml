@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.shape.Sphere?>
+
+<HBox alignment="CENTER" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vodichian.packager.ToolController">
+   <Label fx:id="nameLabel" alignment="CENTER_RIGHT" prefWidth="150.0" text="Tool Name" textAlignment="RIGHT" HBox.hgrow="ALWAYS">
+      <HBox.margin>
+         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+      </HBox.margin>
+   </Label>
+   <Button minWidth="60.0" mnemonicParsing="false" onAction="#run" prefWidth="60.0" text="Run">
+      <HBox.margin>
+         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+      </HBox.margin>
+   </Button>
+   <Button minWidth="60.0" mnemonicParsing="false" onAction="#config" prefWidth="60.0" text="Config">
+      <HBox.margin>
+         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+      </HBox.margin>
+   </Button>
+   <Sphere fx:id="toolSphere" radius="10.0">
+      <HBox.margin>
+         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+      </HBox.margin>
+   </Sphere>
+   <Sphere fx:id="configSphere" radius="10.0">
+      <HBox.margin>
+         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+      </HBox.margin>
+   </Sphere>
+</HBox>
