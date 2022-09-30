@@ -62,7 +62,7 @@ public class SettingsController {
     public void load(AbstractTool tool) {
         this.tool = tool;
         if (tool.getSettings().getName().equals(ToolName.BUILD_EXTRACTOR)) {
-            nameLabel.setText(ToolName.BUILD_EXTRACTOR.name() + "Settings");
+            nameLabel.setText(ToolName.BUILD_EXTRACTOR.name() + " Settings");
             toolTextField.setDisable(true);
             configTextField.setDisable(true);
         } else {
@@ -84,6 +84,7 @@ public class SettingsController {
     private File displayFileChooser(AbstractTool tool, String title) {
         Collection<FileChooser.ExtensionFilter> filters = tool.getFilters();
         FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
         fileChooser.setTitle(title);
         fileChooser.getExtensionFilters().addAll(filters);
         return fileChooser.showOpenDialog(nameLabel.getScene().getWindow());
