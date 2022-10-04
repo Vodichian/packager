@@ -1,6 +1,6 @@
 package com.vodichian.packager;
 
-import com.vodichian.packager.tool.AbstractTool;
+import com.vodichian.packager.tool.ToolSettings;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -32,12 +32,12 @@ public class App extends Application {
         scene.setRoot(loadFXML(fxml));
     }
 
-    static void displaySettings(AbstractTool tool) throws IOException {
+    static void displaySettings(ToolSettings settings) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("settings.fxml"));
         Parent parent = fxmlLoader.load();
         scene.setRoot(parent);
         SettingsController controller = fxmlLoader.getController();
-        controller.load(tool);
+        controller.load(settings);
     }
 
     private static Parent loadFXML(String fxml) throws IOException {

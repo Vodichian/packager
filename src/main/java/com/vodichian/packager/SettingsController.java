@@ -1,7 +1,8 @@
 package com.vodichian.packager;
 
-import com.vodichian.packager.tool.AbstractTool;
+import com.vodichian.packager.tool.ToolFactory;
 import com.vodichian.packager.tool.ToolName;
+import com.vodichian.packager.tool.ToolSettings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -18,33 +19,43 @@ public class SettingsController {
     private TextField toolTextField;
     @FXML
     private TextField configTextField;
-    private AbstractTool tool;
+    private ToolSettings settings;
 
     @FXML
     private void initialize() {
         toolTextField.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getClickCount() >= 2) {
-                File file = displayFileChooser(tool, "Select location for the tool");
+                File file;
+                try {
+                    file = displayFileChooser(settings, "Select location for the tool");
+                } catch (PackagerException e) {
+                    throw new RuntimeException(e);
+                }
                 if (file != null) {
+                    settings.setToolLocation(file);
                     try {
-                        tool.setTool(file);
+                        ToolFactory.save(settings);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                    toolTextField.setText(file.getAbsolutePath());
                 }
             }
         });
         configTextField.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getClickCount() >= 2) {
-                File file = displayFileChooser(tool, "Select location for the configuration");
+                File file;
+                try {
+                    file = displayFileChooser(settings, "Select location for the configuration");
+                } catch (PackagerException e) {
+                    throw new RuntimeException(e);
+                }
                 if (file != null) {
+                    settings.setConfiguration(file);
                     try {
-                        tool.setConfiguration(file);
+                        ToolFactory.save(settings);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                    configTextField.setText(file.getAbsolutePath());
                 }
             }
         });
@@ -59,30 +70,36 @@ public class SettingsController {
         }
     }
 
-    public void load(AbstractTool tool) {
-        this.tool = tool;
-        if (tool.getSettings().getName().equals(ToolName.BUILD_EXTRACTOR)) {
+    public void load(ToolSettings settings) {
+        this.settings = settings;
+        if (settings.getName().equals(ToolName.BUILD_EXTRACTOR)) {
             nameLabel.setText(ToolName.BUILD_EXTRACTOR.name() + " Settings");
             toolTextField.setDisable(true);
             configTextField.setDisable(true);
         } else {
             toolTextField.setDisable(false);
             configTextField.setDisable(false);
-            nameLabel.setText(tool.getSettings().getName() + " Settings");
-            File toolFile = tool.getSettings().getToolLocation();
+            nameLabel.setText(settings.getName() + " Settings");
+            File toolFile = settings.getToolLocation();
             if (toolFile != null) {
-                toolTextField.setText(tool.getSettings().getToolLocation().getAbsolutePath());
+                toolTextField.setText(settings.getToolLocation().getAbsolutePath());
             }
 
-            File configFile = tool.getSettings().getConfiguration();
+            File configFile = settings.getConfiguration();
             if (configFile != null) {
-                configTextField.setText(tool.getSettings().getConfiguration().getAbsolutePath());
+                configTextField.setText(settings.getConfiguration().getAbsolutePath());
             }
         }
+        settings.toolLocationProperty
+                .addListener(observable ->
+                        toolTextField.setText(settings.toolLocationProperty.get().getAbsolutePath()));
+
+        settings.configurationProperty.addListener(observable ->
+                configTextField.setText(settings.configurationProperty.get().getAbsolutePath()));
     }
 
-    private File displayFileChooser(AbstractTool tool, String title) {
-        Collection<FileChooser.ExtensionFilter> filters = tool.getFilters();
+    private File displayFileChooser(ToolSettings settings, String title) throws PackagerException {
+        Collection<FileChooser.ExtensionFilter> filters = ToolFactory.getFilters(settings);
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
         fileChooser.setTitle(title);

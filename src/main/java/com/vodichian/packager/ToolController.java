@@ -55,7 +55,7 @@ public class ToolController {
     private void config() {
         // switch to settings view using this ToolSetting
         try {
-            App.displaySettings(tool);
+            App.displaySettings(tool.getSettings());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

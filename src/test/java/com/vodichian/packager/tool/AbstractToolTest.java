@@ -1,12 +1,9 @@
 package com.vodichian.packager.tool;
 
-import javafx.stage.FileChooser;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.testng.annotations.Test;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
 
 import static org.testng.Assert.*;
 
@@ -33,46 +30,37 @@ public class AbstractToolTest {
         void execute() {
 
         }
-
-        @Override
-        public Collection<FileChooser.ExtensionFilter> getFilters() {
-            return null;
-        }
     };
 
     @Test
-    public void testSetTool() throws IOException {
+    public void testSetTool() {
         assertNull(abstractTool.tool().get());
         File tool = getRandomFile();
-        boolean result = abstractTool.setTool(tool);
-        assertTrue(result);
+        abstractTool.getSettings().setToolLocation(tool);
         assertTrue(abstractTool.toolIsValid().get());
         assertEquals(abstractTool.tool().get(), tool);
         assertEquals(abstractTool.getSettings().getToolLocation(), tool);
 
         validTool = false;
         tool = getRandomFile();
-        result = abstractTool.setTool(tool);
-        assertFalse(result);
+        abstractTool.getSettings().setToolLocation(tool);
         assertFalse(abstractTool.toolIsValid().get());
         assertEquals(abstractTool.tool().get(), tool);
         assertEquals(abstractTool.getSettings().getToolLocation(), tool);
     }
 
     @Test
-    public void testSetConfiguration() throws IOException {
+    public void testSetConfiguration() {
         assertNull(abstractTool.configuration().get());
         File config = getRandomFile();
-        boolean result = abstractTool.setConfiguration(config);
-        assertTrue(result);
+        abstractTool.getSettings().setConfiguration(config);
         assertTrue(abstractTool.configIsValid().get());
         assertEquals(abstractTool.configuration().get(), config);
         assertEquals(abstractTool.getSettings().getConfiguration(), config);
 
         validConfig = false;
         config = getRandomFile();
-        result = abstractTool.setConfiguration(config);
-        assertFalse(result);
+        abstractTool.getSettings().setConfiguration(config);
         assertFalse(abstractTool.configIsValid().get());
         assertEquals(abstractTool.configuration().get(), config);
         assertEquals(abstractTool.getSettings().getConfiguration(), config);

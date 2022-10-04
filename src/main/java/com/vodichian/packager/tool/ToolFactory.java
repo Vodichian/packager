@@ -6,6 +6,7 @@ import com.vodichian.packager.ToolController;
 import com.vodichian.packager.Utils;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,6 +24,13 @@ import java.util.stream.Stream;
  * Creates {@link AbstractTool} instances using provided settings
  */
 public class ToolFactory {
+    private static final FileChooser.ExtensionFilter ISS_EXT = new FileChooser.ExtensionFilter("Inno Config Files", "*.iss");
+    private static final FileChooser.ExtensionFilter ALL_EXT = new FileChooser.ExtensionFilter("All Files", "*.*");
+    private static final Collection<FileChooser.ExtensionFilter> INNO_FILTERS = Arrays.asList(ISS_EXT, ALL_EXT);
+    private static final FileChooser.ExtensionFilter XML_EXT = new FileChooser.ExtensionFilter("XML Files", "*.xml");
+    private static final Collection<FileChooser.ExtensionFilter> LAUNCH4J_FILTERS = Arrays.asList(XML_EXT, ALL_EXT);
+
+
     public static final String TOOL_DIRECTORY = "tools";
     public static final String SETTING_EXTENSION = "tul";
 
@@ -116,5 +125,17 @@ public class ToolFactory {
                 throw new RuntimeException(e);
             }
         }).collect(Collectors.toList());
+    }
+
+    public static Collection<FileChooser.ExtensionFilter> getFilters(ToolSettings settings) throws PackagerException {
+        switch (settings.getName()) {
+            case LAUNCH_4_J:
+                return LAUNCH4J_FILTERS;
+            case INNO_SETUP:
+                return INNO_FILTERS;
+            default: {
+                throw new PackagerException("File filters not supported for " + settings.getName());
+            }
+        }
     }
 }
