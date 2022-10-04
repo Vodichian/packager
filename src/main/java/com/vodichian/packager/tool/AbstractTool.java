@@ -15,25 +15,27 @@ public abstract class AbstractTool {
     private final ReadOnlyBooleanWrapper validConfiguration = new ReadOnlyBooleanWrapper(false);
     private final ReadOnlyObjectWrapper<File> toolWrapper = new ReadOnlyObjectWrapper<>();
     private final ReadOnlyObjectWrapper<File> configWrapper = new ReadOnlyObjectWrapper<>();
+    private final ReadOnlyObjectWrapper<ToolName> toolNameWrapper = new ReadOnlyObjectWrapper<>();
 
     private final ToolSettings settings;
 
     protected AbstractTool(ToolSettings settings) {
         this.settings = settings;
+        toolNameWrapper.bind(settings.nameProperty);
+        configWrapper.bind((settings.configurationProperty));
+        toolWrapper.bind(settings.toolLocationProperty);
     }
 
     public boolean setTool(File tool) throws IOException {
         validPathToTool.set(validateTool(tool));
-        toolWrapper.set(tool);
         settings.setToolLocation(tool);
         ToolFactory.save(settings);
         return validPathToTool.get();
     }
 
     public boolean setConfiguration(File configuration) throws IOException {
-        configWrapper.set(configuration);
-        validConfiguration.set(validateConfiguration(configuration));
         settings.setConfiguration(configuration);
+        validConfiguration.set(validateConfiguration(configuration));
         ToolFactory.save(settings);
         return validConfiguration.get();
     }

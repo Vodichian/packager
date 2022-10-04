@@ -46,7 +46,9 @@ public class ToolFactory {
 
     public static void save(ToolSettings settings) throws IOException {
         String filename = TOOL_DIRECTORY + "/" + settings.getName() + "." + SETTING_EXTENSION;
-        settings.save(new File(filename));
+        File file = new File(filename);
+        settings.save(file);
+        System.out.println("Settings saved to " + file.getAbsolutePath());
     }
 
     public static Collection<AbstractTool> tools() throws IOException, PackagerException {
