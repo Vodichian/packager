@@ -66,4 +66,17 @@ public class AbstractToolTest {
         assertEquals(abstractTool.getSettings().getConfiguration(), config);
     }
 
+    @Test
+    public void testName() {
+        assertEquals(abstractTool.name().get(), ToolName.LAUNCH_4_J);
+    }
+
+    /**
+     * Hard to test here, as state is mostly controlled and modified by the implementing classes. Just verify initial
+     * state is {@link ToolState#CONFIG_ERROR}.
+     */
+    @Test
+    public void testState() {
+        assertEquals(abstractTool.state().get(), ToolState.CONFIG_ERROR);
+    }
 }

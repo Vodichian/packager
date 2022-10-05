@@ -128,6 +128,9 @@ public class ToolFactory {
     }
 
     public static Collection<FileChooser.ExtensionFilter> getFilters(ToolSettings settings) throws PackagerException {
+        if (settings.getName() == null) {
+            throw new PackagerException("ToolSettings name has not been set");
+        }
         switch (settings.getName()) {
             case LAUNCH_4_J:
                 return LAUNCH4J_FILTERS;

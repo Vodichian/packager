@@ -13,6 +13,7 @@ public abstract class AbstractTool {
     private final ReadOnlyObjectWrapper<File> toolWrapper = new ReadOnlyObjectWrapper<>();
     private final ReadOnlyObjectWrapper<File> configWrapper = new ReadOnlyObjectWrapper<>();
     private final ReadOnlyObjectWrapper<ToolName> toolNameWrapper = new ReadOnlyObjectWrapper<>();
+    protected final ReadOnlyObjectWrapper<ToolState> toolStateWrapper = new ReadOnlyObjectWrapper<>(ToolState.CONFIG_ERROR);
 
     private final ToolSettings settings;
 
@@ -31,6 +32,10 @@ public abstract class AbstractTool {
         return toolWrapper.getReadOnlyProperty();
     }
 
+    public ReadOnlyObjectProperty<ToolName> name() {
+        return toolNameWrapper.getReadOnlyProperty();
+    }
+
     public ReadOnlyObjectProperty<File> configuration() {
         return configWrapper.getReadOnlyProperty();
     }
@@ -41,6 +46,15 @@ public abstract class AbstractTool {
 
     public ReadOnlyBooleanProperty configIsValid() {
         return validConfiguration.getReadOnlyProperty();
+    }
+
+    /**
+     * Used to monitor the current state of this tool.
+     *
+     * @return a {@link ToolState} property
+     */
+    public ReadOnlyObjectProperty<ToolState> state() {
+        return toolStateWrapper.getReadOnlyProperty();
     }
 
     protected abstract boolean validateConfiguration(File configuration);
