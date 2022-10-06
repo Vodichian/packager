@@ -17,7 +17,7 @@ public class App extends Application {
     private static Scene scene;
     private static CloseListener currentController;
 
-    private static Monitor monitor;
+    private static Model model;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -45,14 +45,16 @@ public class App extends Application {
         Parent parent = fxmlLoader.load();
         scene.setRoot(parent);
         if (currentController != null) currentController.onClose();
-        PrimaryController primaryController = fxmlLoader.getController();
-        primaryController.setMonitor(monitor);
-        currentController = primaryController;
+        currentController = fxmlLoader.<PrimaryController>getController();
 
     }
 
+    public static Model getModel() {
+        return model;
+    }
+
     public static void main(String[] args) {
-        monitor = new Monitor();
+        model = new Model();
         launch();
     }
 

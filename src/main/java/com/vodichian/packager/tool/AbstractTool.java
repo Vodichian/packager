@@ -24,7 +24,9 @@ public abstract class AbstractTool {
         toolWrapper.bind(settings.toolLocationProperty);
 
         toolWrapper.addListener(observable -> validPathToTool.set(validateTool(toolWrapper.get())));
+        validPathToTool.set(validateTool(toolWrapper.get()));
         configWrapper.addListener((observable -> validConfiguration.set(validateConfiguration(configWrapper.get()))));
+        validConfiguration.set(validateConfiguration(configWrapper.get()));
 
     }
 

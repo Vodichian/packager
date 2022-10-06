@@ -10,12 +10,15 @@ import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 
-public class Monitor {
+/**
+ * Model for Packager, holds data that needs to persist between screen transitions.
+ */
+public class Model {
     private final ReadOnlyListWrapper<ToolMessage> MESSAGES = new ReadOnlyListWrapper<>(
             FXCollections.observableList(new ArrayList<>()));
     public final ReadOnlyListProperty<ToolMessage> messages = MESSAGES.getReadOnlyProperty();
 
-    public Monitor() {
+    public Model() {
         EventBus.getDefault().register(this);
     }
 

@@ -64,7 +64,9 @@ public class ToolController {
 
     private void monitorToolStatus() {
         tool.toolIsValid().addListener((observableValue, aBoolean, t1) -> processStatusChange(t1, toolSphere));
+        processStatusChange(tool.toolIsValid().get(), toolSphere);
         tool.configIsValid().addListener((observableValue, aBoolean, t1) -> processStatusChange(t1, configSphere));
+        processStatusChange(tool.configIsValid().get(), configSphere);
     }
 
     private void processStatusChange(Boolean valid, Sphere sphere) {

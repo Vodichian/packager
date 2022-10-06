@@ -15,10 +15,11 @@ public class PrimaryController implements CloseListener {
     private VBox toolVBox;
     @FXML
     private ListView<ToolMessage> messageListView;
-    private Monitor monitor;
 
     @FXML
     private void initialize() {
+        Model model = App.getModel();
+        messageListView.itemsProperty().bind(model.messages);
         try {
             displayTools();
         } catch (PackagerException | IOException e) {
@@ -40,10 +41,5 @@ public class PrimaryController implements CloseListener {
 
     @Override
     public void onClose() {
-    }
-
-    public void setMonitor(Monitor monitor) {
-        this.monitor = monitor;
-        messageListView.itemsProperty().bind(monitor.messages);
     }
 }

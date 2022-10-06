@@ -111,7 +111,8 @@ public class SettingsController implements CloseListener {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
         fileChooser.setTitle("Select location for the tool");
-        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Executable Files", "*.exe"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Executable Files", "*.exe"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("All", "*.*"));
         return fileChooser.showOpenDialog(nameLabel.getScene().getWindow());
     }
 
