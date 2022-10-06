@@ -7,6 +7,7 @@ import com.vodichian.packager.Utils;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.stage.FileChooser;
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,7 +58,7 @@ public class ToolFactory {
         String filename = TOOL_DIRECTORY + "/" + settings.getName() + "." + SETTING_EXTENSION;
         File file = new File(filename);
         settings.save(file);
-        System.out.println("Settings saved to " + file.getAbsolutePath());
+        EventBus.getDefault().post(new ToolMessage("Settings saved to " + file.getAbsolutePath()));
     }
 
     public static Collection<AbstractTool> tools() throws IOException, PackagerException {

@@ -1,6 +1,7 @@
 package com.vodichian.packager.tool;
 
 import com.vodichian.packager.Utils;
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.util.Optional;
@@ -16,23 +17,15 @@ public class Launch4jTool extends AbstractTool {
     @Override
     protected boolean validateConfiguration(File configurationPath) {
         Optional<String> result = Utils.getExtension(configurationPath.getName());
-        if (result.isPresent()) {
-            System.out.println("result = " + result.get());
-            return result.get().equals("xml");
-        } else {
-            return false;
-        }
+        return result.map(s -> s.equals("xml")).orElse(false);
     }
 
     @Override
     protected boolean validateTool(File tool) {
         Optional<String> result = getExtension(tool.getName());
-        if (result.isPresent()) {
-            System.out.println("result = " + result.get());
-            return result.get().equals("exe");
-        } else {
-            return false;
-        }
+        boolean isValid = result.map(s -> s.equals("exe")).orElse(false);
+        EventBus.getDefault().post(new ToolMessage("Launch4j Tool> tool is valid: " + isValid));
+        return isValid;
     }
 
     @Override

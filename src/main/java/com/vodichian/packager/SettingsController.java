@@ -12,7 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 
-public class SettingsController {
+public class SettingsController implements CloseListener {
     @FXML
     private Label nameLabel;
     @FXML
@@ -27,7 +27,7 @@ public class SettingsController {
             if (mouseEvent.getClickCount() >= 2) {
                 File file;
                 try {
-                    file = displayFileChooser(settings, "Select location for the tool");
+                    file = displayExeFileChooser();
                 } catch (PackagerException e) {
                     throw new RuntimeException(e);
                 }
@@ -45,7 +45,7 @@ public class SettingsController {
             if (mouseEvent.getClickCount() >= 2) {
                 File file;
                 try {
-                    file = displayFileChooser(settings, "Select location for the configuration");
+                    file = displayConfigFileChooser(settings);
                 } catch (PackagerException e) {
                     throw new RuntimeException(e);
                 }
@@ -64,7 +64,7 @@ public class SettingsController {
     @FXML
     private void back() {
         try {
-            App.setRoot("primary");
+            App.displayPrimary();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -98,12 +98,25 @@ public class SettingsController {
                 configTextField.setText(settings.configurationProperty.get().getAbsolutePath()));
     }
 
-    private File displayFileChooser(ToolSettings settings, String title) throws PackagerException {
+    private File displayConfigFileChooser(ToolSettings settings) throws PackagerException {
         Collection<FileChooser.ExtensionFilter> filters = ToolFactory.getFilters(settings);
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
-        fileChooser.setTitle(title);
+        fileChooser.setTitle("Select location for the configuration");
         fileChooser.getExtensionFilters().addAll(filters);
         return fileChooser.showOpenDialog(nameLabel.getScene().getWindow());
+    }
+
+    private File displayExeFileChooser() throws PackagerException {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        fileChooser.setTitle("Select location for the tool");
+        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Executable Files", "*.exe"));
+        return fileChooser.showOpenDialog(nameLabel.getScene().getWindow());
+    }
+
+    @Override
+    public void onClose() {
+        // unused
     }
 }

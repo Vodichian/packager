@@ -8,5 +8,4 @@ public class Utils {
                 .filter(f -> f.contains("."))
                 .map(f -> f.substring(filename.lastIndexOf(".") + 1));
     }
-
 }

@@ -12,20 +12,20 @@
    <center>
        <VBox spacing="20.0">
            <padding>
-               <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+               <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
            </padding>
-           <VBox fx:id="toolVBox" prefHeight="200.0"/>
-           <ListView prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS"/>
+           <VBox fx:id="toolVBox" prefHeight="200.0" />
+           <ListView fx:id="messageListView" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
        </VBox>
    </center>
    <top>
        <HBox BorderPane.alignment="CENTER">
            <ToolBar prefHeight="40.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
-               <Button mnemonicParsing="false" text="Run"/>
-               <Button mnemonicParsing="false" text="Options"/>
+               <Button mnemonicParsing="false" text="Run" />
+               <Button mnemonicParsing="false" text="Options" />
            </ToolBar>
            <ToolBar prefHeight="40.0" HBox.hgrow="NEVER">
-               <Button mnemonicParsing="false" onAction="#onExit" text="Exit"/>
+               <Button mnemonicParsing="false" onAction="#onExit" text="Exit" />
            </ToolBar>
        </HBox>
    </top>

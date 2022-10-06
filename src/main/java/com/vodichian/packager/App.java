@@ -15,21 +15,18 @@ import java.io.IOException;
 public class App extends Application {
 
     private static Scene scene;
+    private static CloseListener currentController;
+
+    private static Monitor monitor;
 
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("primary"), 640, 480);
+        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("primary.fxml"));
+        Parent parent = fxmlLoader.load();
+        scene = new Scene(parent, 640, 480);
         stage.setScene(scene);
+        currentController = fxmlLoader.getController();
         stage.show();
-    }
-
-    /**
-     * @param fxml the name of the fxml file
-     * @throws IOException if file fails to load
-     */
-    static void setRoot(String fxml) throws IOException {
-        /* default */
-        scene.setRoot(loadFXML(fxml));
     }
 
     static void displaySettings(ToolSettings settings) throws IOException {
@@ -37,15 +34,25 @@ public class App extends Application {
         Parent parent = fxmlLoader.load();
         scene.setRoot(parent);
         SettingsController controller = fxmlLoader.getController();
+        if (currentController != null) currentController.onClose();
+        currentController = controller;
         controller.load(settings);
+
     }
 
-    private static Parent loadFXML(String fxml) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
-        return fxmlLoader.load();
+    static void displayPrimary() throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("primary.fxml"));
+        Parent parent = fxmlLoader.load();
+        scene.setRoot(parent);
+        if (currentController != null) currentController.onClose();
+        PrimaryController primaryController = fxmlLoader.getController();
+        primaryController.setMonitor(monitor);
+        currentController = primaryController;
+
     }
 
     public static void main(String[] args) {
+        monitor = new Monitor();
         launch();
     }
 
