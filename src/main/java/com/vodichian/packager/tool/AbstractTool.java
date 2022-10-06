@@ -6,36 +6,36 @@ import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 
 import java.io.File;
-import java.util.Optional;
 
 public abstract class AbstractTool {
     private final ReadOnlyBooleanWrapper validPathToTool = new ReadOnlyBooleanWrapper(false);
     private final ReadOnlyBooleanWrapper validConfiguration = new ReadOnlyBooleanWrapper(false);
     private final ReadOnlyObjectWrapper<File> toolWrapper = new ReadOnlyObjectWrapper<>();
     private final ReadOnlyObjectWrapper<File> configWrapper = new ReadOnlyObjectWrapper<>();
+    private final ReadOnlyObjectWrapper<ToolName> toolNameWrapper = new ReadOnlyObjectWrapper<>();
+    protected final ReadOnlyObjectWrapper<ToolState> toolStateWrapper = new ReadOnlyObjectWrapper<>(ToolState.CONFIG_ERROR);
 
-    private ToolSettings settings;
+    private final ToolSettings settings;
 
     protected AbstractTool(ToolSettings settings) {
         this.settings = settings;
-    }
+        toolNameWrapper.bind(settings.nameProperty);
+        configWrapper.bind((settings.configurationProperty));
+        toolWrapper.bind(settings.toolLocationProperty);
 
-    public boolean setTool(File tool) {
-        validPathToTool.set(validateTool(tool));
-        toolWrapper.set(tool);
-        settings.setToolLocation(tool);
-        return validPathToTool.get();
-    }
+        toolWrapper.addListener(observable -> validPathToTool.set(validateTool(toolWrapper.get())));
+        validPathToTool.set(validateTool(toolWrapper.get()));
+        configWrapper.addListener((observable -> validConfiguration.set(validateConfiguration(configWrapper.get()))));
+        validConfiguration.set(validateConfiguration(configWrapper.get()));
 
-    public boolean setConfiguration(File configuration) {
-        configWrapper.set(configuration);
-        validConfiguration.set(validateConfiguration(configuration));
-        settings.setConfiguration(configuration);
-        return validConfiguration.get();
     }
 
     public ReadOnlyObjectProperty<File> tool() {
         return toolWrapper.getReadOnlyProperty();
+    }
+
+    public ReadOnlyObjectProperty<ToolName> name() {
+        return toolNameWrapper.getReadOnlyProperty();
     }
 
     public ReadOnlyObjectProperty<File> configuration() {
@@ -48,6 +48,15 @@ public abstract class AbstractTool {
 
     public ReadOnlyBooleanProperty configIsValid() {
         return validConfiguration.getReadOnlyProperty();
+    }
+
+    /**
+     * Used to monitor the current state of this tool.
+     *
+     * @return a {@link ToolState} property
+     */
+    public ReadOnlyObjectProperty<ToolState> state() {
+        return toolStateWrapper.getReadOnlyProperty();
     }
 
     protected abstract boolean validateConfiguration(File configuration);

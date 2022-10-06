@@ -6,6 +6,8 @@ import com.vodichian.packager.ToolController;
 import com.vodichian.packager.Utils;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.stage.FileChooser;
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,6 +25,14 @@ import java.util.stream.Stream;
  * Creates {@link AbstractTool} instances using provided settings
  */
 public class ToolFactory {
+    private static final FileChooser.ExtensionFilter ISS_EXT = new FileChooser.ExtensionFilter("Inno Config Files", "*.iss");
+    private static final FileChooser.ExtensionFilter ALL_EXT = new FileChooser.ExtensionFilter("All Files", "*.*");
+    private static final Collection<FileChooser.ExtensionFilter> INNO_FILTERS = Arrays.asList(ISS_EXT, ALL_EXT);
+    private static final FileChooser.ExtensionFilter XML_EXT = new FileChooser.ExtensionFilter("XML Files", "*.xml");
+    private static final Collection<FileChooser.ExtensionFilter> LAUNCH4J_FILTERS = Arrays.asList(XML_EXT, ALL_EXT);
+    public static final String NAME = "ToolFactory";
+
+
     public static final String TOOL_DIRECTORY = "tools";
     public static final String SETTING_EXTENSION = "tul";
 
@@ -44,6 +55,13 @@ public class ToolFactory {
         return tool;
     }
 
+    public static void save(ToolSettings settings) throws IOException {
+        String filename = TOOL_DIRECTORY + "/" + settings.getName() + "." + SETTING_EXTENSION;
+        File file = new File(filename);
+        settings.save(file);
+        EventBus.getDefault().post(new ToolMessage(NAME, "Settings saved to " + file.getAbsolutePath()));
+    }
+
     public static Collection<AbstractTool> tools() throws IOException, PackagerException {
         // Look in tool directory for ToolSettings files for settings
         Path toolDir = getToolDirectory();
@@ -55,8 +73,7 @@ public class ToolFactory {
                     .noneMatch(settings -> settings.getName().equals(toolName));
             if (noneMatch) {
                 ToolSettings settings = new ToolSettings().setName(toolName);
-                String filename = TOOL_DIRECTORY + "/" + toolName + "." + SETTING_EXTENSION;
-                settings.save(new File(filename));
+                save(settings);
                 allSettings.add(settings);
             }
         }
@@ -110,5 +127,20 @@ public class ToolFactory {
                 throw new RuntimeException(e);
             }
         }).collect(Collectors.toList());
+    }
+
+    public static Collection<FileChooser.ExtensionFilter> getFilters(ToolSettings settings) throws PackagerException {
+        if (settings.getName() == null) {
+            throw new PackagerException("ToolSettings name has not been set");
+        }
+        switch (settings.getName()) {
+            case LAUNCH_4_J:
+                return LAUNCH4J_FILTERS;
+            case INNO_SETUP:
+                return INNO_FILTERS;
+            default: {
+                throw new PackagerException("File filters not supported for " + settings.getName());
+            }
+        }
     }
 }

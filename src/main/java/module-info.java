@@ -1,6 +1,7 @@
 module com.vodichian.packager {
     requires javafx.controls;
     requires javafx.fxml;
+    requires eventbus.java;
 
     opens com.vodichian.packager to javafx.fxml;
     exports com.vodichian.packager;

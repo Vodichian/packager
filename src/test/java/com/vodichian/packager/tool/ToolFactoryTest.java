@@ -4,6 +4,7 @@ import com.vodichian.packager.PackagerException;
 import com.vodichian.packager.Utils;
 import javafx.application.Platform;
 import javafx.scene.Parent;
+import javafx.stage.FileChooser;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -115,5 +116,23 @@ public class ToolFactoryTest {
         List<Parent> toolViews = ToolFactory.toolViews();
         assertNotNull(toolViews);
         assertEquals(ToolName.values().length, toolViews.size());
+    }
+
+    @Test
+    public void testGetFilters() throws PackagerException {
+        try {
+            ToolFactory.getFilters(new ToolSettings());
+            fail("ToolSettings name was not set and should have thrown an exception");
+        } catch (PackagerException ignored) {
+        }
+        Collection<FileChooser.ExtensionFilter> filters = ToolFactory.getFilters(new ToolSettings().setName(ToolName.LAUNCH_4_J));
+        assertFalse(filters.isEmpty());
+        filters = ToolFactory.getFilters(new ToolSettings().setName(ToolName.INNO_SETUP));
+        assertFalse(filters.isEmpty());
+        try {
+            ToolFactory.getFilters(new ToolSettings().setName(ToolName.BUILD_EXTRACTOR));
+            fail("BUILD_EXTRACTOR is invalid and should have thrown an exception");
+        } catch (PackagerException ignored) {
+        }
     }
 }

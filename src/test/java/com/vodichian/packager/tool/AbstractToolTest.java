@@ -36,16 +36,14 @@ public class AbstractToolTest {
     public void testSetTool() {
         assertNull(abstractTool.tool().get());
         File tool = getRandomFile();
-        boolean result = abstractTool.setTool(tool);
-        assertTrue(result);
+        abstractTool.getSettings().setToolLocation(tool);
         assertTrue(abstractTool.toolIsValid().get());
         assertEquals(abstractTool.tool().get(), tool);
         assertEquals(abstractTool.getSettings().getToolLocation(), tool);
 
         validTool = false;
         tool = getRandomFile();
-        result = abstractTool.setTool(tool);
-        assertFalse(result);
+        abstractTool.getSettings().setToolLocation(tool);
         assertFalse(abstractTool.toolIsValid().get());
         assertEquals(abstractTool.tool().get(), tool);
         assertEquals(abstractTool.getSettings().getToolLocation(), tool);
@@ -55,19 +53,30 @@ public class AbstractToolTest {
     public void testSetConfiguration() {
         assertNull(abstractTool.configuration().get());
         File config = getRandomFile();
-        boolean result = abstractTool.setConfiguration(config);
-        assertTrue(result);
+        abstractTool.getSettings().setConfiguration(config);
         assertTrue(abstractTool.configIsValid().get());
         assertEquals(abstractTool.configuration().get(), config);
         assertEquals(abstractTool.getSettings().getConfiguration(), config);
 
         validConfig = false;
         config = getRandomFile();
-        result = abstractTool.setConfiguration(config);
-        assertFalse(result);
+        abstractTool.getSettings().setConfiguration(config);
         assertFalse(abstractTool.configIsValid().get());
         assertEquals(abstractTool.configuration().get(), config);
         assertEquals(abstractTool.getSettings().getConfiguration(), config);
     }
 
+    @Test
+    public void testName() {
+        assertEquals(abstractTool.name().get(), ToolName.LAUNCH_4_J);
+    }
+
+    /**
+     * Hard to test here, as state is mostly controlled and modified by the implementing classes. Just verify initial
+     * state is {@link ToolState#CONFIG_ERROR}.
+     */
+    @Test
+    public void testState() {
+        assertEquals(abstractTool.state().get(), ToolState.CONFIG_ERROR);
+    }
 }
