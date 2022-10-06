@@ -1,11 +1,18 @@
 package com.vodichian.packager.tool;
 
+import com.vodichian.packager.Utils;
+import org.greenrobot.eventbus.EventBus;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Optional;
+
+import static com.vodichian.packager.Utils.getExtension;
 
 public class InnoTool extends AbstractTool {
+    public static final String NAME = "InnoTool";
 
     public InnoTool(ToolSettings settings) {
         super(settings);
@@ -13,12 +20,24 @@ public class InnoTool extends AbstractTool {
 
     @Override
     protected boolean validateConfiguration(File configurationPath) {
-        return false;
+        if (configurationPath == null) {
+            EventBus.getDefault().post(new ToolMessage(NAME, "Configuration path was null"));
+            return false;
+        }
+        Optional<String> result = Utils.getExtension(configurationPath.getName());
+        return result.map(s -> s.equals("iss")).orElse(false);
     }
 
     @Override
     protected boolean validateTool(File tool) {
-        return false;
+        if (tool == null) {
+            EventBus.getDefault().post(new ToolMessage(NAME, "Tool path was null"));
+            return false;
+        }
+        Optional<String> result = getExtension(tool.getName());
+        boolean isValid = result.map(s -> s.equals("exe")).orElse(false);
+        EventBus.getDefault().post(new ToolMessage(NAME, "Tool is valid: " + isValid));
+        return isValid;
     }
 
     @Override

@@ -10,6 +10,8 @@ import static com.vodichian.packager.Utils.getExtension;
 
 public class Launch4jTool extends AbstractTool {
 
+    private static final String NAME = "Launch4j";
+
     public Launch4jTool(ToolSettings settings) {
         super(settings);
     }
@@ -17,7 +19,7 @@ public class Launch4jTool extends AbstractTool {
     @Override
     protected boolean validateConfiguration(File configurationPath) {
         if (configurationPath == null) {
-            EventBus.getDefault().post(new ToolMessage("Configuration path was null"));
+            EventBus.getDefault().post(new ToolMessage(NAME, "Configuration path was null"));
             return false;
         }
         Optional<String> result = Utils.getExtension(configurationPath.getName());
@@ -27,12 +29,12 @@ public class Launch4jTool extends AbstractTool {
     @Override
     protected boolean validateTool(File tool) {
         if (tool == null) {
-            EventBus.getDefault().post(new ToolMessage("Tool path was null"));
+            EventBus.getDefault().post(new ToolMessage(NAME,"Tool path was null"));
             return false;
         }
         Optional<String> result = getExtension(tool.getName());
         boolean isValid = result.map(s -> s.equals("exe")).orElse(false);
-        EventBus.getDefault().post(new ToolMessage("Launch4j Tool> tool is valid: " + isValid));
+        EventBus.getDefault().post(new ToolMessage(NAME, "Tool is valid: " + isValid));
         return isValid;
     }
 

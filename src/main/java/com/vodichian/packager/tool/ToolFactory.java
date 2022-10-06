@@ -30,6 +30,7 @@ public class ToolFactory {
     private static final Collection<FileChooser.ExtensionFilter> INNO_FILTERS = Arrays.asList(ISS_EXT, ALL_EXT);
     private static final FileChooser.ExtensionFilter XML_EXT = new FileChooser.ExtensionFilter("XML Files", "*.xml");
     private static final Collection<FileChooser.ExtensionFilter> LAUNCH4J_FILTERS = Arrays.asList(XML_EXT, ALL_EXT);
+    public static final String NAME = "ToolFactory";
 
 
     public static final String TOOL_DIRECTORY = "tools";
@@ -58,7 +59,7 @@ public class ToolFactory {
         String filename = TOOL_DIRECTORY + "/" + settings.getName() + "." + SETTING_EXTENSION;
         File file = new File(filename);
         settings.save(file);
-        EventBus.getDefault().post(new ToolMessage("Settings saved to " + file.getAbsolutePath()));
+        EventBus.getDefault().post(new ToolMessage(NAME, "Settings saved to " + file.getAbsolutePath()));
     }
 
     public static Collection<AbstractTool> tools() throws IOException, PackagerException {

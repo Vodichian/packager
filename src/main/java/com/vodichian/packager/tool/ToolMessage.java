@@ -5,13 +5,15 @@ package com.vodichian.packager.tool;
  */
 public class ToolMessage {
     public final String message;
+    public final String sender;
 
-    public ToolMessage(String message) {
+    public ToolMessage(String sender, String message) {
         this.message = message;
+        this.sender = sender;
     }
 
     @Override
     public String toString() {
-        return message;
+        return sender + "> " + message;
     }
 }
