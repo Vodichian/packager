@@ -2,6 +2,7 @@ package com.vodichian.packager;
 
 import com.vodichian.packager.tool.ToolFactory;
 import com.vodichian.packager.tool.ToolMessage;
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.ListView;
@@ -20,11 +21,18 @@ public class PrimaryController implements CloseListener {
     private void initialize() {
         Model model = App.getModel();
         messageListView.itemsProperty().bind(model.messages);
+        makeAutoScroll(messageListView);
         try {
             displayTools();
         } catch (PackagerException | IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void makeAutoScroll(ListView<ToolMessage> listView) {
+        listView.getItems().addListener(
+                (ListChangeListener<? super ToolMessage>) change ->
+                        listView.scrollTo(listView.getItems().size()));
     }
 
     private void displayTools() throws PackagerException, IOException {

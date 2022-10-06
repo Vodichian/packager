@@ -63,7 +63,7 @@ public abstract class AbstractTool {
 
     protected abstract boolean validateTool(File file);
 
-    abstract void execute();
+    public abstract void execute();
 
     public ToolSettings getSettings() {
         return settings;

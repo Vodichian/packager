@@ -12,7 +12,7 @@ import java.util.Optional;
 import static com.vodichian.packager.Utils.getExtension;
 
 public class InnoTool extends AbstractTool {
-    public static final String NAME = "InnoTool";
+    private static final String NAME = "InnoTool";
 
     public InnoTool(ToolSettings settings) {
         super(settings);
@@ -41,7 +41,7 @@ public class InnoTool extends AbstractTool {
     }
 
     @Override
-    void execute() {
+    public void execute() {
         // TODO: 10/3/2022 make this work
         String command = "C:\\Program Files (x86)\\Inno Setup 6\\ISCC.exe";
         String config = "C:\\Users\\Rick\\Vodichian Projects\\Guild\\inno-build2.iss";
@@ -54,17 +54,22 @@ public class InnoTool extends AbstractTool {
     private void monitor(ProcessBuilder pb) {
         Runnable r = () -> {
             try {
+                toolStateWrapper.set(ToolState.RUNNING);
                 Process p = pb.start();
                 try (BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
                     String line;
                     while ((line = input.readLine()) != null) {
-                        // error message: "Compile aborted."
-                        // success message: "Successful compile"
-                        System.out.println(line);
+                        EventBus.getDefault().post(new ToolMessage(NAME, line));
+                        if (line.contains("Compile aborted.")) { // error message: "Compile aborted."
+                            toolStateWrapper.set(ToolState.FAILURE);
+                        } else if (line.contains("Successful compile")) { // success message: "Successful compile"
+                            toolStateWrapper.set(ToolState.SUCCESS);
+                        }
                     }
                 }
             } catch (IOException e) {
-                System.err.println("Something bad happened: " + e.getMessage());
+                toolStateWrapper.set(ToolState.FAILURE);
+                EventBus.getDefault().post(new ToolMessage(NAME, e.getMessage()));
             }
         };
         new Thread(r).start();

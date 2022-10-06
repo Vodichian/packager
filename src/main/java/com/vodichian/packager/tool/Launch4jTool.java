@@ -39,7 +39,7 @@ public class Launch4jTool extends AbstractTool {
     }
 
     @Override
-    void execute() {
+    public void execute() {
 
     }
 

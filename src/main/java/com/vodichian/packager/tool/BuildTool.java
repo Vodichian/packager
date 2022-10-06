@@ -18,7 +18,7 @@ public class BuildTool extends AbstractTool {
     }
 
     @Override
-    void execute() {
+    public void execute() {
 
     }
 }

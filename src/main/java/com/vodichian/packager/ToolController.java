@@ -48,7 +48,7 @@ public class ToolController {
 
     @FXML
     private void run() {
-        System.out.println("Run was clicked");
+        tool.execute();
     }
 
     @FXML
