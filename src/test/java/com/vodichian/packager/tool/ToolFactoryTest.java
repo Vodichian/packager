@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.testng.Assert.*;
@@ -25,7 +26,6 @@ public class ToolFactoryTest {
         Platform.startup(() -> {
         });
     }
-
 
     @Test
     public void testMake() {
@@ -73,6 +73,7 @@ public class ToolFactoryTest {
             assertEquals(size, 0);
         }
 
+        ToolFactory.reset(); // need to do this because previous tests may have already created tool instances
         // ToolFactory.tools() should now create default settings and return a collection of AbstractTool
         Collection<AbstractTool> tools = ToolFactory.tools();
         assertEquals(tools.size(), ToolName.values().length);
@@ -84,7 +85,7 @@ public class ToolFactoryTest {
                     .filter(path -> Utils.getExtension(path.toFile().getName())
                             .orElse("none").equals(ToolFactory.SETTING_EXTENSION))
                     .count();
-            assertEquals(size, ToolName.values().length);
+            assertEquals(size, ToolName.values().length, "Default settings were not correctly created");
         }
 
         // cleanup
@@ -133,6 +134,18 @@ public class ToolFactoryTest {
             ToolFactory.getFilters(new ToolSettings().setName(ToolName.BUILD_EXTRACTOR));
             fail("BUILD_EXTRACTOR is invalid and should have thrown an exception");
         } catch (PackagerException ignored) {
+        }
+    }
+
+    @Test
+    public void testGetTool() throws PackagerException, IOException {
+        ToolFactory.tools(); // ensure the tools have been created
+        assertTrue(ToolName.values().length > 0);
+        for (ToolName toolName : ToolName.values()) {
+            Optional<AbstractTool> optional = ToolFactory.getTool(toolName);
+            assertNotNull(optional);
+            assertTrue(optional.isPresent());
+            assertEquals(optional.get().name().get(), toolName);
         }
     }
 }

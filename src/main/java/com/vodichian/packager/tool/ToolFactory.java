@@ -14,10 +14,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -32,9 +29,25 @@ public class ToolFactory {
     private static final Collection<FileChooser.ExtensionFilter> LAUNCH4J_FILTERS = Arrays.asList(XML_EXT, ALL_EXT);
     public static final String NAME = "ToolFactory";
 
+    private final static List<AbstractTool> toolList = new ArrayList<>();
+
 
     public static final String TOOL_DIRECTORY = "tools";
     public static final String SETTING_EXTENSION = "tul";
+
+    /**
+     * Resets this {@link ToolFactory} to its initial state.
+     *
+     * @apiNote intended for testing purposes.
+     */
+    public static void reset() {
+        toolList.clear();
+    }
+
+    public static Optional<AbstractTool> getTool(ToolName name) {
+        return toolList.stream()
+                .filter(tool -> tool.getSettings().getName().equals(name)).findAny();
+    }
 
     public static AbstractTool make(ToolSettings settings) throws PackagerException {
         AbstractTool tool;
@@ -63,26 +76,27 @@ public class ToolFactory {
     }
 
     public static Collection<AbstractTool> tools() throws IOException, PackagerException {
-        // Look in tool directory for ToolSettings files for settings
-        Path toolDir = getToolDirectory();
-        // Build tools from settings
-        Collection<ToolSettings> allSettings = getToolSettings(toolDir);
-        // Verify all tool settings exist, create defaults for any missing
-        for (ToolName toolName : ToolName.values()) {
-            boolean noneMatch = allSettings.stream()
-                    .noneMatch(settings -> settings.getName().equals(toolName));
-            if (noneMatch) {
-                ToolSettings settings = new ToolSettings().setName(toolName);
-                save(settings);
-                allSettings.add(settings);
+        if (toolList.isEmpty()) {
+            // Look in tool directory for ToolSettings files for settings
+            Path toolDir = getToolDirectory();
+            // Build tools from settings
+            Collection<ToolSettings> allSettings = getToolSettings(toolDir);
+            // Verify all tool settings exist, create defaults for any missing
+            for (ToolName toolName : ToolName.values()) {
+                boolean noneMatch = allSettings.stream()
+                        .noneMatch(settings -> settings.getName().equals(toolName));
+                if (noneMatch) {
+                    ToolSettings settings = new ToolSettings().setName(toolName);
+                    save(settings);
+                    allSettings.add(settings);
+                }
+            }
+
+            for (ToolSettings toolSettings : allSettings) {
+                toolList.add(make(toolSettings));
             }
         }
-
-        ArrayList<AbstractTool> tools = new ArrayList<>(allSettings.size());
-        for (ToolSettings toolSettings : allSettings) {
-            tools.add(make(toolSettings));
-        }
-        return tools;
+        return Collections.unmodifiableCollection(toolList);
     }
 
     private static Collection<ToolSettings> getToolSettings(Path toolDir) throws IOException {
