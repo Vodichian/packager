@@ -73,6 +73,7 @@ public class ToolFactoryTest {
             assertEquals(size, 0);
         }
 
+        ToolFactory.reset(); // need to do this because previous tests may have already created tool instances
         // ToolFactory.tools() should now create default settings and return a collection of AbstractTool
         Collection<AbstractTool> tools = ToolFactory.tools();
         assertEquals(tools.size(), ToolName.values().length);
@@ -84,7 +85,7 @@ public class ToolFactoryTest {
                     .filter(path -> Utils.getExtension(path.toFile().getName())
                             .orElse("none").equals(ToolFactory.SETTING_EXTENSION))
                     .count();
-            assertEquals(size, ToolName.values().length);
+            assertEquals(size, ToolName.values().length, "Default settings were not correctly created");
         }
 
         // cleanup
