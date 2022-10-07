@@ -4,6 +4,7 @@ import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 
@@ -16,6 +17,10 @@ public abstract class AbstractTool {
     protected final ReadOnlyObjectWrapper<ToolState> toolStateWrapper = new ReadOnlyObjectWrapper<>(ToolState.CONFIG_ERROR);
 
     private final ToolSettings settings;
+
+    protected void post(String message) {
+        EventBus.getDefault().post(new ToolMessage(getClass().getSimpleName(), message));
+    }
 
     protected AbstractTool(ToolSettings settings) {
         this.settings = settings;

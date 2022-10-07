@@ -2,6 +2,8 @@ module com.vodichian.packager {
     requires javafx.controls;
     requires javafx.fxml;
     requires eventbus.java;
+    requires maven.model; // extracts version from pom.xml
+    requires plexus.utils; // required for maven-model
 
     opens com.vodichian.packager to javafx.fxml;
     exports com.vodichian.packager;

@@ -1,7 +1,6 @@
 package com.vodichian.packager.tool;
 
 import com.vodichian.packager.Utils;
-import org.greenrobot.eventbus.EventBus;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,7 +11,6 @@ import java.util.Optional;
 import static com.vodichian.packager.Utils.getExtension;
 
 public class InnoTool extends AbstractTool {
-    private static final String NAME = "InnoTool";
 
     public InnoTool(ToolSettings settings) {
         super(settings);
@@ -53,10 +51,6 @@ public class InnoTool extends AbstractTool {
         ProcessBuilder pb = new ProcessBuilder(command, config);
         pb.redirectErrorStream(true);
         monitor(pb);
-    }
-
-    private void post(String message) {
-        EventBus.getDefault().post(new ToolMessage(NAME, message));
     }
 
     private void monitor(ProcessBuilder pb) {
