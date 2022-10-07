@@ -75,7 +75,6 @@ public class SettingsController implements CloseListener {
         if (settings.getName().equals(ToolName.BUILD_EXTRACTOR)) {
             nameLabel.setText(ToolName.BUILD_EXTRACTOR.name() + " Settings");
             toolTextField.setDisable(true);
-            configTextField.setDisable(true);
         } else {
             toolTextField.setDisable(false);
             configTextField.setDisable(false);
@@ -85,10 +84,10 @@ public class SettingsController implements CloseListener {
                 toolTextField.setText(settings.getToolLocation().getAbsolutePath());
             }
 
-            File configFile = settings.getConfiguration();
-            if (configFile != null) {
-                configTextField.setText(settings.getConfiguration().getAbsolutePath());
-            }
+        }
+        File configFile = settings.getConfiguration();
+        if (configFile != null) {
+            configTextField.setText(settings.getConfiguration().getAbsolutePath());
         }
         settings.toolLocationProperty
                 .addListener(observable ->

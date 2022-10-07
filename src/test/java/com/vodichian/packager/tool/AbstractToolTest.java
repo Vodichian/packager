@@ -27,7 +27,7 @@ public class AbstractToolTest {
         }
 
         @Override
-        void execute() {
+        public void execute() {
 
         }
     };
