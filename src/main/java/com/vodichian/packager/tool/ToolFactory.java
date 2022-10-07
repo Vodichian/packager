@@ -44,6 +44,11 @@ public class ToolFactory {
         toolList.clear();
     }
 
+    public static Optional<AbstractTool> getTool(ToolName name) {
+        return toolList.stream()
+                .filter(tool -> tool.getSettings().getName().equals(name)).findAny();
+    }
+
     public static AbstractTool make(ToolSettings settings) throws PackagerException {
         AbstractTool tool;
         switch (settings.getName()) {
