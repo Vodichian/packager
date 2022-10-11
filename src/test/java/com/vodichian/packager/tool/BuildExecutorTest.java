@@ -30,17 +30,22 @@ public class BuildExecutorTest {
                 .setName(ToolName.LAUNCH_4_J)
                 .setConfiguration(launch4jConfig);
 
+        File innoConfig = new File("src/test/resources/inno-build.iss"); // in test/resources
+        ToolSettings innoSettings = new ToolSettings()
+                .setName(ToolName.INNO_SETUP)
+                .setConfiguration(innoConfig);
+
         ObjectProperty<ToolState> toolState = new SimpleObjectProperty<>();
 
         // Change pom.xml to have random version
         String randomVersion = makeRandomVersion();
         updatePom(randomVersion, pomXMl);
 
-        executor.execute(buildSettings, toolState, launchSettings);
+        executor.execute(buildSettings, toolState, launchSettings, innoSettings);
 
         boolean shouldBeTrue = verifyLaunch(randomVersion, launch4jConfig);
         assertTrue(shouldBeTrue);
-        assertEquals(toolState.get(), ToolState.SUCCESS); // TODO: 10/11/2022 this is failing because Inno update hasn't been implemented
+        assertEquals(toolState.get(), ToolState.SUCCESS);
     }
 
     private boolean verifyLaunch(String randomVersion, File launchConfig) throws IOException {

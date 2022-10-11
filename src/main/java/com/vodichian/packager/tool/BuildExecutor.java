@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
@@ -19,18 +20,21 @@ public class BuildExecutor implements Executor {
     @Override
     public void execute(ToolSettings settings, ObjectProperty<ToolState> toolState) {
         // Update version in Launch4j configuration
-        Optional<AbstractTool> optional = ToolFactory.getTool(ToolName.LAUNCH_4_J);
-        if (optional.isPresent()) {
-            Launch4jTool launchTool = (Launch4jTool) optional.get();
-            execute(settings, toolState, launchTool.getSettings());
+        Optional<AbstractTool> optionalLaunch = ToolFactory.getTool(ToolName.LAUNCH_4_J);
+        Optional<AbstractTool> optionalInno = ToolFactory.getTool(ToolName.LAUNCH_4_J);
+        if (optionalLaunch.isPresent() && optionalInno.isPresent()) {
+            Launch4jTool launchTool = (Launch4jTool) optionalLaunch.get();
+            InnoTool innoTool = (InnoTool) optionalInno.get();
+            execute(settings, toolState, launchTool.getSettings(), innoTool.getSettings());
         } else {
-            post("Launch4j tool not found");
+            post("A tool was not found");
             toolState.set(ToolState.FAILURE);
         }
 
     }
 
-    protected void execute(ToolSettings buildSettings, ObjectProperty<ToolState> toolState, ToolSettings launchSettings) {
+    protected void execute(ToolSettings buildSettings, ObjectProperty<ToolState> toolState,
+                           ToolSettings launchSettings, ToolSettings innoSettings) {
         toolState.set(ToolState.RUNNING);
         try {
             // Get Version
@@ -54,7 +58,7 @@ public class BuildExecutor implements Executor {
             }
 
             // Update version in Inno configuration
-            success = updateInno(version);
+            success = updateInno(version, innoSettings);
             post("Updated Inno Setup... " + success);
             if (!success) {
                 toolState.set(ToolState.FAILURE);
@@ -72,8 +76,64 @@ public class BuildExecutor implements Executor {
         EventBus.getDefault().post(new ToolMessage(getClass().getSimpleName(), message));
     }
 
-    private boolean updateInno(String version) {
-        return false; // TODO: 10/7/2022 implement this method
+    private boolean updateInno(String version, ToolSettings innoSettings) {
+        // version can be written as is
+        // Read lines into file
+        List<String> lines;
+        Path configurationPath = innoSettings.configurationProperty.get().toPath();
+        try {
+            lines = Files.readAllLines(configurationPath);
+        } catch (IOException e) {
+            post("Failed to read Inno configuration: " + innoSettings.configurationProperty.get().getAbsolutePath());
+            return false;
+
+        }
+        // identify line with #define MyAppVersion
+        int indexOfVersion = 0; // will never be the first line
+        for (int i = 0; i < lines.size(); i++) {
+            if (lines.get(i).contains("#define MyAppVersion")) {
+                indexOfVersion = i;
+                break;
+            }
+        }
+        if (indexOfVersion == 0) {
+            post("MyAppVersion was not found");
+            return false;
+        }
+
+        // replace existing version with updated version in line
+        String updatedLine = replaceInnoContent(lines.get(indexOfVersion), version);
+        lines.set(indexOfVersion, updatedLine);
+        // make backup of file
+        try {
+            Files.copy(configurationPath,
+                    new File(configurationPath.toFile().getAbsolutePath() + ".bak").toPath(),
+                    StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            post("Failed to create backup: " + e.getMessage());
+            return false;
+        }
+
+        // write lines back to file
+        try {
+            Files.write(configurationPath, lines);
+        } catch (IOException e) {
+            post("Failed to save configuration: " + e.getMessage());
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Inno uses <code>#define MyAppVersion "version"</code>
+     * @param line the line containing old version
+     * @param version the updated version string
+     * @return a String containing the updated version
+     */
+    private String replaceInnoContent(String line, String version) {
+        int startIndex = line.indexOf("\"") + 1;
+        int endIndex = line.indexOf("\"", startIndex);
+        return line.substring(0, startIndex) + version + line.substring(endIndex);
     }
 
     /**
