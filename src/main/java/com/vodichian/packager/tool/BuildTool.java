@@ -1,18 +1,11 @@
 package com.vodichian.packager.tool;
 
-
-import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.nio.file.Files;
 
 public class BuildTool extends AbstractTool {
-    public BuildTool(ToolSettings settings) {
-        super(settings);
+    public BuildTool(ToolSettings settings, Executor executor) {
+        super(settings, executor);
     }
 
     /**
@@ -47,18 +40,4 @@ public class BuildTool extends AbstractTool {
         return true;
     }
 
-    @Override
-    public void execute() {
-        MavenXpp3Reader reader = new MavenXpp3Reader();
-        Model model = null;
-        try {
-            model = reader.read(new FileReader(getSettings().getConfiguration()));
-            post(model.getId());
-            post(model.getGroupId());
-            post(model.getArtifactId());
-            post(model.getVersion());
-        } catch (IOException | XmlPullParserException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

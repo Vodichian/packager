@@ -53,13 +53,13 @@ public class ToolFactory {
         AbstractTool tool;
         switch (settings.getName()) {
             case LAUNCH_4_J:
-                tool = new Launch4jTool(settings);
+                tool = new Launch4jTool(settings, new LaunchExecutor());
                 break;
             case INNO_SETUP:
-                tool = new InnoTool(settings);
+                tool = new InnoTool(settings, new InnoExecutor());
                 break;
             case BUILD_EXTRACTOR:
-                tool = new BuildTool(settings);
+                tool = new BuildTool(settings, new BuildExecutor());
                 break;
             default: {
                 throw new PackagerException("Unsupported tool: " + settings.getName());

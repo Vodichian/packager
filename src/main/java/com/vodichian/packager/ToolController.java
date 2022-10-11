@@ -48,7 +48,12 @@ public class ToolController {
 
     @FXML
     private void run() {
-        tool.execute();
+        try {
+            tool.execute();
+        } catch (PackagerException e) {
+            System.err.println("Run failure: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 
     @FXML
