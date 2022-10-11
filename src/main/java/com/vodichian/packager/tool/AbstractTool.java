@@ -1,9 +1,8 @@
 package com.vodichian.packager.tool;
 
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyBooleanWrapper;
-import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.ReadOnlyObjectWrapper;
+import com.vodichian.packager.PackagerException;
+import javafx.beans.property.*;
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 
@@ -16,9 +15,16 @@ public abstract class AbstractTool {
     protected final ReadOnlyObjectWrapper<ToolState> toolStateWrapper = new ReadOnlyObjectWrapper<>(ToolState.CONFIG_ERROR);
 
     private final ToolSettings settings;
+    private final Executor executor;
 
-    protected AbstractTool(ToolSettings settings) {
+    protected void post(String message) {
+        System.out.println(getClass().getSimpleName() + "> " + message);
+        EventBus.getDefault().post(new ToolMessage(getClass().getSimpleName(), message));
+    }
+
+    protected AbstractTool(ToolSettings settings, Executor executor) {
         this.settings = settings;
+        this.executor = executor;
         toolNameWrapper.bind(settings.nameProperty);
         configWrapper.bind((settings.configurationProperty));
         toolWrapper.bind(settings.toolLocationProperty);
@@ -63,7 +69,17 @@ public abstract class AbstractTool {
 
     protected abstract boolean validateTool(File file);
 
-    public abstract void execute();
+    public void execute() throws PackagerException {
+        if (!toolIsValid().get() || !configIsValid().get()) {
+            post("Tool is not configured correctly, aborting...");
+            toolStateWrapper.set(ToolState.CONFIG_ERROR);
+            return;
+        }
+
+        ObjectProperty<ToolState> monitor = new SimpleObjectProperty<>(toolStateWrapper.get());
+        toolStateWrapper.bind(monitor);
+        executor.execute(settings, monitor);
+    }
 
     public ToolSettings getSettings() {
         return settings;

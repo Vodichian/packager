@@ -26,7 +26,7 @@ public class ToolFactory {
     private static final FileChooser.ExtensionFilter ALL_EXT = new FileChooser.ExtensionFilter("All Files", "*.*");
     private static final Collection<FileChooser.ExtensionFilter> INNO_FILTERS = Arrays.asList(ISS_EXT, ALL_EXT);
     private static final FileChooser.ExtensionFilter XML_EXT = new FileChooser.ExtensionFilter("XML Files", "*.xml");
-    private static final Collection<FileChooser.ExtensionFilter> LAUNCH4J_FILTERS = Arrays.asList(XML_EXT, ALL_EXT);
+    private static final Collection<FileChooser.ExtensionFilter> XML_ALL_FILTERS = Arrays.asList(XML_EXT, ALL_EXT);
     public static final String NAME = "ToolFactory";
 
     private final static List<AbstractTool> toolList = new ArrayList<>();
@@ -53,13 +53,13 @@ public class ToolFactory {
         AbstractTool tool;
         switch (settings.getName()) {
             case LAUNCH_4_J:
-                tool = new Launch4jTool(settings);
+                tool = new Launch4jTool(settings, new LaunchExecutor());
                 break;
             case INNO_SETUP:
-                tool = new InnoTool(settings);
+                tool = new InnoTool(settings, new InnoExecutor());
                 break;
             case BUILD_EXTRACTOR:
-                tool = new BuildTool(settings);
+                tool = new BuildTool(settings, new BuildExecutor());
                 break;
             default: {
                 throw new PackagerException("Unsupported tool: " + settings.getName());
@@ -149,7 +149,8 @@ public class ToolFactory {
         }
         switch (settings.getName()) {
             case LAUNCH_4_J:
-                return LAUNCH4J_FILTERS;
+            case BUILD_EXTRACTOR:
+                return XML_ALL_FILTERS;
             case INNO_SETUP:
                 return INNO_FILTERS;
             default: {

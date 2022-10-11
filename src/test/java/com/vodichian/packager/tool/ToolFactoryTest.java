@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -126,15 +127,29 @@ public class ToolFactoryTest {
             fail("ToolSettings name was not set and should have thrown an exception");
         } catch (PackagerException ignored) {
         }
+        // test Launch4j
         Collection<FileChooser.ExtensionFilter> filters = ToolFactory.getFilters(new ToolSettings().setName(ToolName.LAUNCH_4_J));
-        assertFalse(filters.isEmpty());
+        List<String> extensionsLaunch = new ArrayList<>();
+        filters.forEach(extensionFilter -> extensionsLaunch.addAll(extensionFilter.getExtensions()));
+        assertEquals(extensionsLaunch.size(), 2);
+        assertTrue(extensionsLaunch.contains("*.xml"));
+        assertTrue(extensionsLaunch.contains("*.*"));
+
+        // test Inno
         filters = ToolFactory.getFilters(new ToolSettings().setName(ToolName.INNO_SETUP));
-        assertFalse(filters.isEmpty());
-        try {
-            ToolFactory.getFilters(new ToolSettings().setName(ToolName.BUILD_EXTRACTOR));
-            fail("BUILD_EXTRACTOR is invalid and should have thrown an exception");
-        } catch (PackagerException ignored) {
-        }
+        List<String> extensionsInno = new ArrayList<>();
+        filters.forEach(extensionFilter -> extensionsInno.addAll(extensionFilter.getExtensions()));
+        assertEquals(extensionsInno.size(), 2);
+        assertTrue(extensionsInno.contains("*.iss"));
+        assertTrue(extensionsInno.contains("*.*"));
+
+        // test BuildTool
+        filters = ToolFactory.getFilters(new ToolSettings().setName(ToolName.BUILD_EXTRACTOR));
+        List<String> extensionsBuild = new ArrayList<>();
+        filters.forEach(extensionFilter -> extensionsBuild.addAll(extensionFilter.getExtensions()));
+        assertEquals(extensionsBuild.size(), 2);
+        assertTrue(extensionsBuild.contains("*.xml"));
+        assertTrue(extensionsBuild.contains("*.*"));
     }
 
     @Test
