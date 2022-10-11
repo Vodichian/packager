@@ -21,7 +21,7 @@ public class BuildExecutor implements Executor {
     public void execute(ToolSettings settings, ObjectProperty<ToolState> toolState) {
         // Update version in Launch4j configuration
         Optional<AbstractTool> optionalLaunch = ToolFactory.getTool(ToolName.LAUNCH_4_J);
-        Optional<AbstractTool> optionalInno = ToolFactory.getTool(ToolName.LAUNCH_4_J);
+        Optional<AbstractTool> optionalInno = ToolFactory.getTool(ToolName.INNO_SETUP);
         if (optionalLaunch.isPresent() && optionalInno.isPresent()) {
             Launch4jTool launchTool = (Launch4jTool) optionalLaunch.get();
             InnoTool innoTool = (InnoTool) optionalInno.get();
