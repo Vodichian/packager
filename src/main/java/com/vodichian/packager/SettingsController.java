@@ -4,6 +4,7 @@ import com.vodichian.packager.tool.ToolFactory;
 import com.vodichian.packager.tool.ToolName;
 import com.vodichian.packager.tool.ToolSettings;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
@@ -19,43 +20,44 @@ public class SettingsController implements CloseListener {
     private TextField toolTextField;
     @FXML
     private TextField configTextField;
+    @FXML
+    private Button toolButton;
+    @FXML
+    private Button configButton;
     private ToolSettings settings;
 
     @FXML
     private void initialize() {
-        toolTextField.setOnMouseClicked(mouseEvent -> {
-            if (mouseEvent.getClickCount() >= 2) {
-                File file;
+
+        toolButton.setOnAction(actionEvent -> {
+            File file;
+            try {
+                file = displayExeFileChooser();
+            } catch (PackagerException e) {
+                throw new RuntimeException(e);
+            }
+            if (file != null) {
+                settings.setToolLocation(file);
                 try {
-                    file = displayExeFileChooser();
-                } catch (PackagerException e) {
+                    ToolFactory.save(settings);
+                } catch (IOException e) {
                     throw new RuntimeException(e);
-                }
-                if (file != null) {
-                    settings.setToolLocation(file);
-                    try {
-                        ToolFactory.save(settings);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
                 }
             }
         });
-        configTextField.setOnMouseClicked(mouseEvent -> {
-            if (mouseEvent.getClickCount() >= 2) {
-                File file;
+        configButton.setOnAction(actionEvent -> {
+            File file;
+            try {
+                file = displayConfigFileChooser(settings);
+            } catch (PackagerException e) {
+                throw new RuntimeException(e);
+            }
+            if (file != null) {
+                settings.setConfiguration(file);
                 try {
-                    file = displayConfigFileChooser(settings);
-                } catch (PackagerException e) {
+                    ToolFactory.save(settings);
+                } catch (IOException e) {
                     throw new RuntimeException(e);
-                }
-                if (file != null) {
-                    settings.setConfiguration(file);
-                    try {
-                        ToolFactory.save(settings);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
                 }
             }
         });
