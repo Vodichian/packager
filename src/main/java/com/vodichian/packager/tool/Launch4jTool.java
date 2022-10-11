@@ -3,6 +3,7 @@ package com.vodichian.packager.tool;
 import com.vodichian.packager.Utils;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.Optional;
 
 import static com.vodichian.packager.Utils.getExtension;
@@ -13,12 +14,15 @@ public class Launch4jTool extends AbstractTool {
     }
 
     @Override
-    protected boolean validateConfiguration(File configurationPath) {
-        if (configurationPath == null) {
+    protected boolean validateConfiguration(File configuration) {
+        if (configuration == null) {
             post("Configuration path was null");
             return false;
+        } else if (Files.notExists(configuration.toPath())) {
+            post(configuration.getAbsolutePath() + " does not exist");
+            return false;
         }
-        Optional<String> result = Utils.getExtension(configurationPath.getName());
+        Optional<String> result = Utils.getExtension(configuration.getName());
         return result.map(s -> s.equals("xml")).orElse(false);
     }
 
@@ -26,6 +30,9 @@ public class Launch4jTool extends AbstractTool {
     protected boolean validateTool(File tool) {
         if (tool == null) {
             post("Tool path was null");
+            return false;
+        } else if (Files.notExists(tool.toPath())) {
+            post(tool.getAbsolutePath() + " does not exist");
             return false;
         }
         Optional<String> result = getExtension(tool.getName());
