@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.stage.FileChooser;
 
 import java.io.File;
@@ -24,6 +25,9 @@ public class SettingsController implements CloseListener {
     private Button toolButton;
     @FXML
     private Button configButton;
+    @FXML
+    private TextField priorityTextField;
+
     private ToolSettings settings;
 
     @FXML
@@ -59,6 +63,30 @@ public class SettingsController implements CloseListener {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
+            }
+        });
+
+        priorityTextField.setTextFormatter(new TextFormatter<>(change -> {
+            String text = change.getControlNewText();
+            if (text.isBlank()) return change;
+            try {
+                Integer.parseInt(text);
+            } catch (NumberFormatException e) {
+                return null;
+            }
+            return change;
+        }));
+
+        priorityTextField.textProperty().addListener(observable -> {
+            String text = priorityTextField.getText();
+            if (text.isBlank()) {
+                return;
+            }
+            settings.setPriority(Integer.parseInt(text));
+            try {
+                ToolFactory.save(settings);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         });
     }
@@ -97,6 +125,9 @@ public class SettingsController implements CloseListener {
 
         settings.configurationProperty.addListener(observable ->
                 configTextField.setText(settings.configurationProperty.get().getAbsolutePath()));
+
+        int priority = settings.getPriority();
+        priorityTextField.setText(String.valueOf(priority));
     }
 
     private File displayConfigFileChooser(ToolSettings settings) throws PackagerException {

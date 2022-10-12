@@ -7,6 +7,7 @@
 <?import javafx.scene.shape.Sphere?>
 
 <HBox alignment="CENTER" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vodichian.packager.ToolController">
+   <Label fx:id="priorityLabel" alignment="CENTER_RIGHT" prefWidth="50.0" text="1" textAlignment="RIGHT" HBox.hgrow="ALWAYS" />
    <Label fx:id="nameLabel" alignment="CENTER_RIGHT" prefWidth="150.0" text="Tool Name" textAlignment="RIGHT" HBox.hgrow="ALWAYS">
       <HBox.margin>
          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

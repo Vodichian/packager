@@ -1,6 +1,8 @@
 package com.vodichian.packager.tool;
 
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 import java.io.File;
@@ -20,19 +22,22 @@ public class ToolSettings {
     private static final String NAME_TAG = "name : ";
     private static final String TOOL_TAG = "tool : ";
     private static final String CONFIG_TAG = "config : ";
+    private static final String PRIORITY_TAG = "priority : ";
 
-    public ObjectProperty<ToolName> nameProperty = new SimpleObjectProperty<>();
-    public ObjectProperty<File> toolLocationProperty = new SimpleObjectProperty<>();
-    public ObjectProperty<File> configurationProperty = new SimpleObjectProperty<>();
+    public final ObjectProperty<ToolName> nameProperty = new SimpleObjectProperty<>();
+    public final ObjectProperty<File> toolLocationProperty = new SimpleObjectProperty<>();
+    public final ObjectProperty<File> configurationProperty = new SimpleObjectProperty<>();
+    public final IntegerProperty priorityProperty = new SimpleIntegerProperty(0);
 
     public ToolSettings() {
 
     }
 
-    public ToolSettings(final ToolName name, final File toolLocation, final File configuration) {
-        this.nameProperty = new SimpleObjectProperty<>(name);
-        this.toolLocationProperty = new SimpleObjectProperty<>(toolLocation);
-        this.configurationProperty = new SimpleObjectProperty<>(configuration);
+    public ToolSettings(final ToolName name, final File toolLocation, final File configuration, final int priority) {
+        this.nameProperty.set(name);
+        this.toolLocationProperty.set(toolLocation);
+        this.configurationProperty.set(configuration);
+        this.priorityProperty.set(priority);
     }
 
     public void save(final File file) throws IOException {
@@ -40,7 +45,8 @@ public class ToolSettings {
         writer.println("# ToolSettings");
         writer.printf(NAME_TAG + "%s\n", nameProperty.get());
         writer.printf(TOOL_TAG + "%s\n", (toolLocationProperty.get() == null) ? "" : toolLocationProperty.get().getAbsolutePath());
-        writer.printf(CONFIG_TAG + "%s", (configurationProperty.get() == null) ? "" : configurationProperty.get().getAbsolutePath());
+        writer.printf(CONFIG_TAG + "%s\n", (configurationProperty.get() == null) ? "" : configurationProperty.get().getAbsolutePath());
+        writer.printf(PRIORITY_TAG + "%s", priorityProperty.get());
         writer.close();
     }
 
@@ -57,6 +63,9 @@ public class ToolSettings {
             } else if (line.contains(NAME_TAG)) {
                 ToolName extracted = ToolName.valueOf(line.substring(NAME_TAG.length()));
                 nameProperty.set(extracted);
+            } else if (line.contains(PRIORITY_TAG)) {
+                int priority = Integer.parseInt(line.substring(PRIORITY_TAG.length()));
+                priorityProperty.set(priority);
             }
         });
         lines.close();
@@ -67,7 +76,7 @@ public class ToolSettings {
     }
 
     public ToolSettings setName(final ToolName name) {
-        this.nameProperty.set(name);
+        nameProperty.set(name);
         return this;
     }
 
@@ -76,7 +85,7 @@ public class ToolSettings {
     }
 
     public ToolSettings setToolLocation(final File toolLocation) {
-        this.toolLocationProperty.set(toolLocation);
+        toolLocationProperty.set(toolLocation);
         return this;
     }
 
@@ -85,7 +94,16 @@ public class ToolSettings {
     }
 
     public ToolSettings setConfiguration(final File configuration) {
-        this.configurationProperty.set(configuration);
+        configurationProperty.set(configuration);
         return this;
+    }
+
+    public ToolSettings setPriority(int priority) {
+        priorityProperty.set(priority);
+        return this;
+    }
+
+    public int getPriority() {
+        return priorityProperty.get();
     }
 }

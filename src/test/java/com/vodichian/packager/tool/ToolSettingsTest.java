@@ -22,15 +22,18 @@ public class ToolSettingsTest {
         return new File(RandomStringUtils.randomAlphabetic(10));
     }
 
+
     @Test
     public void saveAndLoad() throws IOException {
         ToolSettings settings = new ToolSettings();
         ToolName name = getRandomName();
         File location = getRandomFile();
+        int priority = RANDOM.nextInt();
         File configuration = getRandomFile();
         settings.setName(name)
                 .setConfiguration(configuration)
-                .setToolLocation(location);
+                .setToolLocation(location)
+                .setPriority(priority);
 
         File saveFile = Files.createTempFile("saveFile", ".tmp").toFile();
         System.out.println(saveFile.getAbsolutePath());
@@ -42,6 +45,7 @@ public class ToolSettingsTest {
         assertEquals(loadedSettings.getName(), name);
         assertEquals(loadedSettings.getToolLocation().getName(), location.getName());
         assertEquals(loadedSettings.getConfiguration().getName(), configuration.getName());
+        assertEquals(loadedSettings.getPriority(), priority);
 
     }
 
@@ -55,7 +59,7 @@ public class ToolSettingsTest {
         assertEquals(settings.getName(), name);
 
         name = getRandomName();
-        settings = new ToolSettings(name, null, null);
+        settings = new ToolSettings(name, null, null, 0);
         assertEquals(settings.getName(), name);
     }
 
@@ -68,7 +72,7 @@ public class ToolSettingsTest {
         assertEquals(settings.getToolLocation(), file);
 
         file = getRandomFile();
-        settings = new ToolSettings(null, file, null);
+        settings = new ToolSettings(null, file, null, 0);
         assertEquals(settings.getToolLocation(), file);
     }
 
@@ -81,7 +85,21 @@ public class ToolSettingsTest {
         assertEquals(settings.getConfiguration(), file);
 
         file = getRandomFile();
-        settings = new ToolSettings(null, null, file);
+        settings = new ToolSettings(null, null, file, 0);
         assertEquals(settings.getConfiguration(), file);
     }
+
+    @Test
+    public void testPriority() {
+        ToolSettings settings = new ToolSettings();
+        assertEquals(settings.getPriority(), 0);
+        int expected = RANDOM.nextInt();
+        settings.setPriority(expected);
+        assertEquals(settings.getPriority(), expected);
+
+        expected = RANDOM.nextInt();
+        settings = new ToolSettings(ToolName.BUILD_EXTRACTOR, null, null, expected);
+        assertEquals(settings.getPriority(), expected);
+    }
+
 }
