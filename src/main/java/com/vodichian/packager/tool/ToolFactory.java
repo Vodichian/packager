@@ -134,13 +134,17 @@ public class ToolFactory {
     }
 
     public static List<Parent> toolViews() throws PackagerException, IOException {
-        return tools().stream().map(tool -> {
-            try {
-                return loadFXML(tool);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }).collect(Collectors.toList());
+        return tools().stream()
+                // reverse order sorting by flipping o2 and o1
+                .sorted((o1, o2) -> Integer.compare(o2.getSettings().getPriority(), o1.getSettings().getPriority()))
+                .map(tool -> {
+                    try {
+                        return loadFXML(tool);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .collect(Collectors.toList());
     }
 
     public static Collection<FileChooser.ExtensionFilter> getFilters(ToolSettings settings) throws PackagerException {
