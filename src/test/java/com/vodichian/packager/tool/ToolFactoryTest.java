@@ -39,7 +39,7 @@ public class ToolFactoryTest {
             fail("Exception was thrown", e);
         }
 
-        settings = new ToolSettings(ToolName.INNO_SETUP, null, null);
+        settings = new ToolSettings(ToolName.INNO_SETUP, null, null, 0);
         try {
             AbstractTool tool = ToolFactory.make(settings);
             assertEquals(tool.getClass(), InnoTool.class);

@@ -21,7 +21,7 @@ public class AbstractToolTest {
     };
     AbstractTool abstractTool = new AbstractTool(new ToolSettings(ToolName.LAUNCH_4_J,
             null,
-            null), testExecutor) {
+            null, 0), testExecutor) {
         @Override
         protected boolean validateConfiguration(File configuration) {
             return validConfig;
