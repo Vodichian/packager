@@ -30,6 +30,11 @@ public class ToolController {
      */
     @FXML
     private Sphere configSphere;
+    /**
+     * Displays the priority for this tool
+     */
+    @FXML
+    private Label priorityLabel;
 
     /**
      * The view this controller is controlling
@@ -42,6 +47,7 @@ public class ToolController {
 
     public void setTool(AbstractTool tool) {
         this.tool = tool;
+        this.priorityLabel.setText(String.valueOf(tool.getSettings().getPriority()));
         nameLabel.setText(tool.getSettings().getName().toString());
         monitorToolStatus();
     }
@@ -72,6 +78,9 @@ public class ToolController {
         processStatusChange(tool.toolIsValid().get(), toolSphere);
         tool.configIsValid().addListener((observableValue, aBoolean, t1) -> processStatusChange(t1, configSphere));
         processStatusChange(tool.configIsValid().get(), configSphere);
+        tool.getSettings().priorityProperty.addListener(observable -> {
+            priorityLabel.setText(String.valueOf(tool.getSettings().getPriority()));
+        });
     }
 
     private void processStatusChange(Boolean valid, Sphere sphere) {
