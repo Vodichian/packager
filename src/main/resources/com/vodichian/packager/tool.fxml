@@ -33,4 +33,5 @@
          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
       </HBox.margin>
    </Sphere>
+   <Sphere fx:id="enabledSphere" radius="10.0" />
 </HBox>

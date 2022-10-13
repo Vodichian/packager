@@ -4,10 +4,7 @@ import com.vodichian.packager.tool.ToolFactory;
 import com.vodichian.packager.tool.ToolName;
 import com.vodichian.packager.tool.ToolSettings;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
+import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 
 import java.io.File;
@@ -27,6 +24,8 @@ public class SettingsController implements CloseListener {
     private Button configButton;
     @FXML
     private TextField priorityTextField;
+    @FXML
+    private ChoiceBox<Boolean> enableChoiceBox;
 
     private ToolSettings settings;
 
@@ -89,6 +88,17 @@ public class SettingsController implements CloseListener {
                 throw new RuntimeException(e);
             }
         });
+
+        enableChoiceBox.getItems().addAll(Boolean.TRUE, Boolean.FALSE);
+        enableChoiceBox.getSelectionModel().selectedItemProperty().addListener(observable -> {
+            Boolean enabled = enableChoiceBox.getSelectionModel().getSelectedItem();
+            settings.setEnabled(enabled);
+            try {
+                ToolFactory.save(settings);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     @FXML
@@ -128,6 +138,7 @@ public class SettingsController implements CloseListener {
 
         int priority = settings.getPriority();
         priorityTextField.setText(String.valueOf(priority));
+        enableChoiceBox.getSelectionModel().select(settings.getEnabled());
     }
 
     private File displayConfigFileChooser(ToolSettings settings) throws PackagerException {

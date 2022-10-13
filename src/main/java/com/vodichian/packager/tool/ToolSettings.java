@@ -1,9 +1,6 @@
 package com.vodichian.packager.tool;
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -23,21 +20,29 @@ public class ToolSettings {
     private static final String TOOL_TAG = "tool : ";
     private static final String CONFIG_TAG = "config : ";
     private static final String PRIORITY_TAG = "priority : ";
+    private static final String ENABLED_TAG = "enabled : ";
 
     public final ObjectProperty<ToolName> nameProperty = new SimpleObjectProperty<>();
     public final ObjectProperty<File> toolLocationProperty = new SimpleObjectProperty<>();
     public final ObjectProperty<File> configurationProperty = new SimpleObjectProperty<>();
     public final IntegerProperty priorityProperty = new SimpleIntegerProperty(0);
+    public final BooleanProperty enabledProperty = new SimpleBooleanProperty(true);
 
     public ToolSettings() {
 
     }
 
-    public ToolSettings(final ToolName name, final File toolLocation, final File configuration, final int priority) {
+    public ToolSettings(
+            final ToolName name,
+            final File toolLocation,
+            final File configuration,
+            final int priority,
+            final boolean enabled) {
         this.nameProperty.set(name);
         this.toolLocationProperty.set(toolLocation);
         this.configurationProperty.set(configuration);
         this.priorityProperty.set(priority);
+        this.enabledProperty.set(enabled);
     }
 
     public void save(final File file) throws IOException {
@@ -46,6 +51,7 @@ public class ToolSettings {
         writer.printf(NAME_TAG + "%s\n", nameProperty.get());
         writer.printf(TOOL_TAG + "%s\n", (toolLocationProperty.get() == null) ? "" : toolLocationProperty.get().getAbsolutePath());
         writer.printf(CONFIG_TAG + "%s\n", (configurationProperty.get() == null) ? "" : configurationProperty.get().getAbsolutePath());
+        writer.printf(ENABLED_TAG + "%s\n", enabledProperty.get());
         writer.printf(PRIORITY_TAG + "%s", priorityProperty.get());
         writer.close();
     }
@@ -66,6 +72,9 @@ public class ToolSettings {
             } else if (line.contains(PRIORITY_TAG)) {
                 int priority = Integer.parseInt(line.substring(PRIORITY_TAG.length()));
                 priorityProperty.set(priority);
+            } else if (line.contains(ENABLED_TAG)) {
+                boolean enabled = Boolean.parseBoolean(line.substring(ENABLED_TAG.length()));
+                enabledProperty.set(enabled);
             }
         });
         lines.close();
@@ -105,5 +114,14 @@ public class ToolSettings {
 
     public int getPriority() {
         return priorityProperty.get();
+    }
+
+    public ToolSettings setEnabled(boolean enabled) {
+        enabledProperty.set(enabled);
+        return this;
+    }
+
+    public boolean getEnabled() {
+        return enabledProperty.get();
     }
 }
