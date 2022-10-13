@@ -35,6 +35,11 @@ public class ToolController {
      */
     @FXML
     private Label priorityLabel;
+    /**
+     * Displays the enabled status for this tool
+     */
+    @FXML
+    private Sphere enabledSphere;
 
     /**
      * The view this controller is controlling
@@ -43,6 +48,7 @@ public class ToolController {
     private void initialize() {
         setSphereColor(toolSphere, Color.RED);
         setSphereColor(configSphere, Color.RED);
+        setSphereColor(enabledSphere, Color.RED);
     }
 
     public void setTool(AbstractTool tool) {
@@ -78,9 +84,9 @@ public class ToolController {
         processStatusChange(tool.toolIsValid().get(), toolSphere);
         tool.configIsValid().addListener((observableValue, aBoolean, t1) -> processStatusChange(t1, configSphere));
         processStatusChange(tool.configIsValid().get(), configSphere);
-        tool.getSettings().priorityProperty.addListener(observable -> {
-            priorityLabel.setText(String.valueOf(tool.getSettings().getPriority()));
-        });
+        tool.getSettings().priorityProperty.addListener(observable -> priorityLabel.setText(String.valueOf(tool.getSettings().getPriority())));
+        tool.getSettings().enabledProperty.addListener((observableValue, aBoolean, t1) -> processStatusChange(t1, enabledSphere));
+        processStatusChange(tool.getSettings().enabledProperty.get(), enabledSphere);
     }
 
     private void processStatusChange(Boolean valid, Sphere sphere) {
