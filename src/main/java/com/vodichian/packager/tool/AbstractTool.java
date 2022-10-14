@@ -1,6 +1,7 @@
 package com.vodichian.packager.tool;
 
 import com.vodichian.packager.PackagerException;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.*;
 import org.greenrobot.eventbus.EventBus;
 
@@ -13,6 +14,12 @@ public abstract class AbstractTool {
     private final ReadOnlyObjectWrapper<File> configWrapper = new ReadOnlyObjectWrapper<>();
     private final ReadOnlyObjectWrapper<ToolName> toolNameWrapper = new ReadOnlyObjectWrapper<>();
     protected final ReadOnlyObjectWrapper<ToolState> toolStateWrapper = new ReadOnlyObjectWrapper<>(ToolState.CONFIG_ERROR);
+
+    /**
+     * Indicates this tools is configured correctly and ready for execution
+     */
+    public final BooleanBinding readyBinding = validPathToTool.and(validConfiguration);
+
 
     private final ToolSettings settings;
     private final Executor executor;
