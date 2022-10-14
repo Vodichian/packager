@@ -112,6 +112,7 @@ public class SequencerTest {
         sequencer.readyProperty.addListener(observable -> stateChanges.add(sequencer.readyProperty.get()));
 
         List<AbstractTool> tools = new ArrayList<>();
+        TestExecutor.settingsList.clear(); // need to reset between different tests because it is static
         tools.add(new TestToolSuccess(new ToolSettings().setName(ToolName.LAUNCH_4_J).setPriority(2), new TestExecutor()));
         tools.add(new TestToolSuccess(new ToolSettings().setName(ToolName.INNO_SETUP).setPriority(1), new TestExecutor()));
         tools.add(new TestToolSuccess(new ToolSettings().setName(ToolName.BUILD_EXTRACTOR).setPriority(3), new TestExecutor()));
@@ -142,7 +143,62 @@ public class SequencerTest {
         } catch (PackagerException e) {
             fail("Sequencer failed", e);
         }
+    }
 
+    /**
+     * Test Plan:
+     * Same {@link #testRunSequence()} but disables a single {@link AbstractTool} and verifies it is not executed
+     */
+    @Test
+    public void testRunSequenceWithDisable() {
+        Sequencer sequencer = new Sequencer();
+        try {
+            sequencer.runSequence();
+            fail("No tools loaded, expected exception to be thrown");
+        } catch (PackagerException e) {
+            // should throw exception because no tools
+        }
+
+        // monitor for changes to currentlyExecutingProperty
+        List<AbstractTool> currentMonitor = new ArrayList<>();
+        sequencer.currentlyExecutingProperty.addListener(observable ->
+                currentMonitor.add(sequencer.currentlyExecutingProperty.get()));
+
+        // monitor for state changes
+        List<Boolean> stateChanges = new ArrayList<>();
+        sequencer.readyProperty.addListener(observable -> stateChanges.add(sequencer.readyProperty.get()));
+
+        List<AbstractTool> tools = new ArrayList<>();
+        TestExecutor.settingsList.clear(); // need to reset between different tests because it is static
+        tools.add(new TestToolSuccess(new ToolSettings().setName(ToolName.LAUNCH_4_J).setPriority(2)
+                .setEnabled(false), new TestExecutor())); // disabled LAUNCH_4_J tool
+        tools.add(new TestToolSuccess(new ToolSettings().setName(ToolName.INNO_SETUP).setPriority(1), new TestExecutor()));
+        tools.add(new TestToolSuccess(new ToolSettings().setName(ToolName.BUILD_EXTRACTOR).setPriority(3), new TestExecutor()));
+
+        sequencer.setTools(tools);
+        assertTrue(sequencer.readyProperty.get());
+
+        try {
+            sequencer.runSequence();
+            // verify state changes
+            assertEquals(stateChanges.size(), 3, stateChanges.toString());
+            assertTrue(stateChanges.get(0));    // changes to true when tools are added
+            assertFalse(stateChanges.get(1));   // changes to false while running
+            assertTrue(stateChanges.get(2));    // changes to true after finished
+
+            // verify execution and priority
+            assertEquals(TestExecutor.settingsList.size(), 2);
+            assertEquals(TestExecutor.settingsList.get(0).getName(), ToolName.BUILD_EXTRACTOR);
+            assertEquals(TestExecutor.settingsList.get(1).getName(), ToolName.INNO_SETUP);
+
+            // verify currentExecuting changes
+            assertEquals(currentMonitor.size(), 3, currentMonitor.toString());
+            assertEquals(currentMonitor.get(0).getSettings().getName(), ToolName.BUILD_EXTRACTOR);
+            assertEquals(currentMonitor.get(1).getSettings().getName(), ToolName.INNO_SETUP);
+            assertNull(currentMonitor.get(2));
+        } catch (PackagerException e) {
+            fail("Sequencer failed", e);
+        }
     }
 }
 

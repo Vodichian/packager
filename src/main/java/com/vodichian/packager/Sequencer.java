@@ -8,6 +8,7 @@ import javafx.beans.property.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Sequentially calls the execute methods on a list of {@link com.vodichian.packager.tool.AbstractTool} instances.
@@ -54,7 +55,12 @@ public class Sequencer {
             throw new PackagerException("The sequencer is not ready");
         }
         // order according to priority
-        tools.sort((o1, o2) -> Integer.compare(o2.getSettings().getPriority(), o1.getSettings().getPriority()));
+        List<AbstractTool> validAndSorted = tools.stream()
+                .filter(tool -> tool.getSettings().enabledProperty.get())
+                .sorted((o1, o2) -> Integer.compare(o2.getSettings().getPriority(), o1.getSettings().getPriority()))
+                .collect(Collectors.toList());
+        tools.clear();
+        tools.addAll(validAndSorted);
         runningProperty.set(true);
         for (AbstractTool tool : tools) {
             currentlyExecutingPropertyWrapper.set(tool);
