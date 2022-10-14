@@ -25,7 +25,6 @@ public class Model {
     @Subscribe
     public void onToolMessage(ToolMessage toolMessage) {
         Platform.runLater(() -> MESSAGES.add(toolMessage));
-
     }
 
 }
