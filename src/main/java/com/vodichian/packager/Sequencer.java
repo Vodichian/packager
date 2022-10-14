@@ -1,9 +1,12 @@
 package com.vodichian.packager;
 
 import com.vodichian.packager.tool.AbstractTool;
+import com.vodichian.packager.tool.ToolMessage;
 import com.vodichian.packager.tool.ToolSettings;
+import com.vodichian.packager.tool.ToolState;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.*;
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,10 +37,11 @@ public class Sequencer {
         // check and monitor ToolState of each tool and set readyPropertyWrapper accordingly
         tools.clear();
         tools.addAll(toolCollection);
-        if (!tools.isEmpty()) {
-            BooleanBinding readyBinding = tools.get(0).readyBinding.and(runningProperty.not());
-            for (int i = 1; i < tools.size(); i++) {
-                readyBinding = readyBinding.and(tools.get(i).readyBinding);
+        List<AbstractTool> filteredTools = tools.stream().filter(tool -> tool.getSettings().enabledProperty.get()).collect(Collectors.toList());
+        if (!filteredTools.isEmpty()) {
+            BooleanBinding readyBinding = filteredTools.get(0).readyBinding.and(runningProperty.not());
+            for (int i = 1; i < filteredTools.size(); i++) {
+                readyBinding = readyBinding.and(filteredTools.get(i).readyBinding);
             }
             readyPropertyWrapper.bind(readyBinding);
         }
@@ -54,6 +58,7 @@ public class Sequencer {
         if (!readyProperty.get()) {
             throw new PackagerException("The sequencer is not ready");
         }
+        runningProperty.set(true);
         // order according to priority
         List<AbstractTool> validAndSorted = tools.stream()
                 .filter(tool -> tool.getSettings().enabledProperty.get())
@@ -61,10 +66,18 @@ public class Sequencer {
                 .collect(Collectors.toList());
         tools.clear();
         tools.addAll(validAndSorted);
-        runningProperty.set(true);
         for (AbstractTool tool : tools) {
+            post("executing " + tool.getSettings().getName());
             currentlyExecutingPropertyWrapper.set(tool);
             tool.execute();
+            do {
+                try {
+                    Thread.sleep(10); // TODO: 10/14/2022 need to rethink how tool.execute is implemented
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            } while (tool.state().get() == ToolState.RUNNING);
+
         }
         runningProperty.set(false);
         currentlyExecutingPropertyWrapper.set(null);
@@ -77,4 +90,8 @@ public class Sequencer {
         return tools.size();
     }
 
+    private void post(String message) {
+        System.out.println(getClass().getSimpleName() + "> " + message);
+        EventBus.getDefault().post(new ToolMessage(getClass().getSimpleName(), message));
+    }
 }
