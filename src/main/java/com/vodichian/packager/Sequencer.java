@@ -3,10 +3,7 @@ package com.vodichian.packager;
 import com.vodichian.packager.tool.AbstractTool;
 import com.vodichian.packager.tool.ToolSettings;
 import javafx.beans.binding.BooleanBinding;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyBooleanWrapper;
-import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,27 +27,18 @@ public class Sequencer {
      * Holds a reference to the {@link AbstractTool} currently executing. Value is <code>null</code> if idle.
      */
     public final ReadOnlyObjectProperty<AbstractTool> currentlyExecutingProperty = currentlyExecutingPropertyWrapper.getReadOnlyProperty();
+    private final BooleanProperty runningProperty = new SimpleBooleanProperty(false);
 
     public void setTools(Collection<AbstractTool> toolCollection) {
         // check and monitor ToolState of each tool and set readyPropertyWrapper accordingly
         tools.clear();
         tools.addAll(toolCollection);
         if (!tools.isEmpty()) {
-            if (tools.size() == 1) {
-                readyPropertyWrapper.bind(tools.get(0).readyBinding);
-            } else {
-                BooleanBinding readyBinding = tools.get(0).readyBinding.and(tools.get(1).readyBinding);
-                if (tools.size() > 2) {
-                    for (int i = 2; i < tools.size(); i++) {
-                        readyBinding = readyBinding.and(tools.get(i).readyBinding);
-                    }
-                }
-                boolean result = readyBinding.get();
-                System.out.println("readyBinding: "+result);
-                System.out.println("readyBinding.isValid: "+readyBinding.isValid());
-//                readyBinding.invalidate();
-                readyPropertyWrapper.bind(readyBinding);
+            BooleanBinding readyBinding = tools.get(0).readyBinding.and(runningProperty.not());
+            for (int i = 1; i < tools.size(); i++) {
+                readyBinding = readyBinding.and(tools.get(i).readyBinding);
             }
+            readyPropertyWrapper.bind(readyBinding);
         }
     }
 
@@ -66,6 +54,14 @@ public class Sequencer {
             throw new PackagerException("The sequencer is not ready");
         }
         // order according to priority
+        tools.sort((o1, o2) -> Integer.compare(o2.getSettings().getPriority(), o1.getSettings().getPriority()));
+        runningProperty.set(true);
+        for (AbstractTool tool : tools) {
+            currentlyExecutingPropertyWrapper.set(tool);
+            tool.execute();
+        }
+        runningProperty.set(false);
+        currentlyExecutingPropertyWrapper.set(null);
     }
 
     /**
