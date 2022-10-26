@@ -17,6 +17,11 @@ public class Project {
         toolSet = new HashSet<>();
     }
 
+    public Project(String name) {
+        this();
+        this.name = name;
+    }
+
     public String getName() {
         return name;
     }

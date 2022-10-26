@@ -2,6 +2,10 @@ package com.vodichian.packager.projects;
 
 import com.amihaiemil.eoyaml.*;
 import com.vodichian.packager.tool.*;
+import javafx.beans.property.ReadOnlyListWrapper;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -9,18 +13,16 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 public class ProjectManager {
-    private final Collection<Project> projects;
+    private final ReadOnlyListWrapper<Project> projects;
     private static ProjectManager INSTANCE;
 
     private ProjectManager() {
-        projects = new HashSet<>();
+        projects = new ReadOnlyListWrapper<>(FXCollections.observableList(new ArrayList<>()));
     }
 
     public static ProjectManager getInstance() {
@@ -157,22 +159,36 @@ public class ProjectManager {
         projects.clear();
     }
 
-    public void add(Project project) {
-        projects.add(project);
+    public Optional<Project> add(final Project project) {
+        boolean exists = projects.stream().anyMatch(p -> p.getName().equals(project.getName()));
+        Project result;
+        if (exists) {
+            post("A project named \"" + project.getName() + "\" already exists.");
+            result = null;
+        } else {
+            projects.add(project);
+            result = project;
+        }
+        return Optional.ofNullable(result);
+    }
+
+    private void post(String message) {
+        System.out.println(getClass().getSimpleName() + "> " + message);
+        EventBus.getDefault().post(new ToolMessage(getClass().getSimpleName(), message));
     }
 
     public void remove(Project project) {
         projects.remove(project);
     }
 
-    public List<Project> getProjects() {
-        return projects.stream().collect(Collectors.toUnmodifiableList());
+    public ObservableList<Project> getProjects() {
+        return projects.getReadOnlyProperty();
     }
 
     /**
      * @return the lass accessed {@link Project}, or null if no projects have been created
      */
-    public Project getLastAccessed() {
-        return projects.stream().max(Comparator.comparing(Project::getLastAccessed)).orElse(null);
+    public Optional<Project> getLastAccessed() {
+        return projects.stream().max(Comparator.comparing(Project::getLastAccessed));
     }
 }

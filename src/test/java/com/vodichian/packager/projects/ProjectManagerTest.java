@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static java.nio.file.Files.createTempFile;
 import static org.testng.Assert.*;
@@ -111,7 +112,6 @@ public class ProjectManagerTest {
         project3.add(tool5);
 
 
-
         projects = new ArrayList<>();
         projects.add(project1);
         projects.add(project2);
@@ -121,11 +121,11 @@ public class ProjectManagerTest {
     @Test(dependsOnMethods = "testLoad")
     public void testGetLastAccessed() {
         ProjectManager pm = ProjectManager.getInstance();
-        Project project = pm.getLastAccessed();
-        assertEquals(project1.getName(), project.getName(), project.getName()+" was returned");
+        pm.getLastAccessed().ifPresentOrElse(
+                project -> assertEquals(project1.getName(), project.getName(), project.getName() + " was returned"),
+                () -> fail("lastAccessed should not have been null"));
     }
 
-    // TODO: 10/22/2022 not really implemented, currently just a platform for exploring the yaml library API
     @Test(dependsOnMethods = {"testSave"})
     public void testLoad() throws IOException {
         ProjectManager pm = ProjectManager.getInstance();
@@ -136,6 +136,8 @@ public class ProjectManagerTest {
         // clear and verify, then load from file
         pm.clearProjects();
         assertTrue(pm.getProjects().isEmpty());
+        pm.getLastAccessed().ifPresentOrElse(project -> fail("should not have been present"),
+                () -> System.out.println("Did not have a lastAccessed project, this is correct"));
 
         pm.load(path);
         assertEquals(pm.getProjects().size(), projects.size());
@@ -170,7 +172,7 @@ public class ProjectManagerTest {
      * First test called, used to build the ProjectManager, fill it programmatically with projects and tools,
      * and verify the success of these steps. This data will be used by later methods.
      */
-    @Test
+    @Test(dependsOnMethods = {"testAdd"})
     public void buildFillVerify() {
         ProjectManager pm = ProjectManager.getInstance();
         pm.clearProjects();
@@ -183,6 +185,20 @@ public class ProjectManagerTest {
         for (Project project : projects) {
             assertTrue(pm.getProjects().contains(project));
         }
+    }
+
+    @Test
+    public void testAdd() {
+        ProjectManager pm = ProjectManager.getInstance();
+        pm.clearProjects();
+        assertTrue(pm.getProjects().isEmpty());
+        String name = "a project";
+        Optional<Project> result = pm.add(new Project(name));
+        assertTrue(result.isPresent());
+        assertEquals(name, result.get().getName());
+        assertEquals(pm.getProjects().size(), 1);
+        result = pm.add(new Project(name));
+        assertFalse(result.isPresent());
     }
 
     private static class MockTool extends AbstractTool {

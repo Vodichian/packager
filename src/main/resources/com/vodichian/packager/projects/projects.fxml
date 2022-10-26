@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox prefHeight="200.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vodichian.packager.projects.ProjectsController">
+    <ToolBar prefHeight="40.0" prefWidth="200.0">
+        <MenuButton fx:id="operationsMenuButton" mnemonicParsing="false" text="Operations">
+            <items>
+                <MenuItem fx:id="newProjectMenuItem" mnemonicParsing="false" text="New Project" />
+                <MenuItem fx:id="loadProjectMenuItem" mnemonicParsing="false" text="Load Project" />
+                <MenuItem fx:id="renameProjectMenuItem" mnemonicParsing="false" text="Rename Project" />
+                <MenuItem fx:id="deleteProjectMenuItem" mnemonicParsing="false" text="Delete Project" />
+            </items>
+        </MenuButton>
+    </ToolBar>
+    <ListView fx:id="projectsListView" prefHeight="200.0" prefWidth="300.0" VBox.vgrow="ALWAYS">
+        <VBox.margin>
+          <Insets />
+        </VBox.margin>
+    </ListView>
+</VBox>
