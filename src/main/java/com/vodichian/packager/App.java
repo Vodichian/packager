@@ -1,5 +1,6 @@
 package com.vodichian.packager;
 
+import com.vodichian.packager.projects.ProjectManager;
 import com.vodichian.packager.tool.ToolSettings;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -7,7 +8,10 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * JavaFX App
@@ -55,6 +59,16 @@ public class App extends Application {
 
     public static void main(String[] args) {
         model = new Model();
+        try {
+            String projectsString = "projects.yaml";
+            File projectsFile = new File(projectsString);
+            if (!Files.exists(projectsFile.toPath())) {
+                Files.createFile(projectsFile.toPath());
+            }
+            ProjectManager.getInstance().load(Paths.get("projects.yaml"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         launch();
     }
 

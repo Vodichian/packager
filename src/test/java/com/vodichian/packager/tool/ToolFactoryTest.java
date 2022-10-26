@@ -115,9 +115,10 @@ public class ToolFactoryTest {
 
     @Test
     public void testToolViews() throws PackagerException, IOException {
-        List<Parent> toolViews = ToolFactory.toolViews();
-        assertNotNull(toolViews);
-        assertEquals(ToolName.values().length, toolViews.size());
+//        List<Parent> toolViews = ToolFactory.toolViews();
+//        assertNotNull(toolViews);
+//        assertEquals(ToolName.values().length, toolViews.size());
+        fail("Refactor this to use new Projects architecture");
     }
 
     @Test

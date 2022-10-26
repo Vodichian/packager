@@ -4,6 +4,7 @@ import com.vodichian.packager.App;
 import com.vodichian.packager.PackagerException;
 import com.vodichian.packager.ToolController;
 import com.vodichian.packager.Utils;
+import com.vodichian.packager.projects.Project;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.stage.FileChooser;
@@ -133,8 +134,8 @@ public class ToolFactory {
         return parent;
     }
 
-    public static List<Parent> toolViews() throws PackagerException, IOException {
-        return tools().stream()
+    public static List<Parent> toolViews(Project project) throws PackagerException, IOException {
+        return project.getTools().stream()
                 // reverse order sorting by flipping o2 and o1
                 .sorted((o1, o2) -> Integer.compare(o2.getSettings().getPriority(), o1.getSettings().getPriority()))
                 .map(tool -> {

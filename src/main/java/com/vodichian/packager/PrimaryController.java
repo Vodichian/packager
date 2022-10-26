@@ -1,5 +1,6 @@
 package com.vodichian.packager;
 
+import com.vodichian.packager.projects.Project;
 import com.vodichian.packager.projects.ProjectsController;
 import com.vodichian.packager.tool.ToolFactory;
 import com.vodichian.packager.tool.ToolMessage;
@@ -30,19 +31,14 @@ public class PrimaryController implements CloseListener {
     private ToggleButton projectsToggleButton;
 
     private final Sequencer sequencer = new Sequencer();
-    private ProjectsController projectsController;
     private Parent projectsView;
+    private Project currentProject;
 
     @FXML
     private void initialize() {
         Model model = App.getModel();
         messageListView.itemsProperty().bind(model.messages);
         makeAutoScroll(messageListView);
-        try {
-            displayTools();
-        } catch (PackagerException | IOException e) {
-            throw new RuntimeException(e);
-        }
 
         runButton.disableProperty().bind(sequencer.readyProperty.not());
         try {
@@ -77,7 +73,8 @@ public class PrimaryController implements CloseListener {
     private void installProjectsUI() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("projects/projects.fxml"));
         projectsView = fxmlLoader.load();
-        projectsController = fxmlLoader.getController();
+        ProjectsController projectsController = fxmlLoader.getController();
+        projectsController.setPrimary(this);
         if (projectsToggleButton.isSelected()) mainBorderPane.leftProperty().set(projectsView);
     }
 
@@ -90,12 +87,6 @@ public class PrimaryController implements CloseListener {
         listView.getItems().addListener(
                 (ListChangeListener<? super ToolMessage>) change ->
                         listView.scrollTo(listView.getItems().size()));
-    }
-
-    private void displayTools() throws PackagerException, IOException {
-        List<Parent> toolViews = ToolFactory.toolViews();
-        toolVBox.getChildren().clear();
-        toolVBox.getChildren().addAll(toolViews);
     }
 
     @FXML
@@ -115,5 +106,17 @@ public class PrimaryController implements CloseListener {
             post("Sequencer failed its run: " + e.getMessage());
             throw new RuntimeException(e);
         }
+    }
+
+    public void setProject(Project project) throws PackagerException, IOException {
+        if (project == null || currentProject == project) {
+            post("setProject> was either null or unchanged");
+            return;
+        }
+        post("Changing to project " + project.getName());
+        this.currentProject = project;
+        List<Parent> views = ToolFactory.toolViews(currentProject);
+        toolVBox.getChildren().clear();
+        toolVBox.getChildren().addAll(views);
     }
 }

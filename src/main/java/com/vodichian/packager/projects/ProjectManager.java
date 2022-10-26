@@ -79,6 +79,7 @@ public class ProjectManager {
         ToolName toolName = ToolName.valueOf(toolNameString);
         AbstractTool tool;
         ToolSettings settings = buildSettings(toolYaml);
+        settings.setName(toolName);
         switch (toolName) {
 
             case INNO_SETUP:
