@@ -8,10 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 /**
  * JavaFX App
@@ -60,12 +57,7 @@ public class App extends Application {
     public static void main(String[] args) {
         model = new Model();
         try {
-            String projectsString = "projects.yaml";
-            File projectsFile = new File(projectsString);
-            if (!Files.exists(projectsFile.toPath())) {
-                Files.createFile(projectsFile.toPath());
-            }
-            ProjectManager.getInstance().load(Paths.get("projects.yaml"));
+            ProjectManager.getInstance().load();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -21,8 +22,12 @@ public class ProjectManager {
     private final ReadOnlyListWrapper<Project> projects;
     private static ProjectManager INSTANCE;
 
+    private Path projectsPath;
+
     private ProjectManager() {
+
         projects = new ReadOnlyListWrapper<>(FXCollections.observableList(new ArrayList<>()));
+        projectsPath = Path.of("projects.yaml");
     }
 
     public static ProjectManager getInstance() {
@@ -33,8 +38,22 @@ public class ProjectManager {
     }
 
     public void load(Path path) throws IOException {
+        if (!Files.exists(path)) {
+            post("Path does not exist: " + path);
+            return;
+        }
+        projectsPath = path;
+        load();
+    }
+
+    public void load() throws IOException {
+        if (projectsPath == null) {
+            throw new IOException("Project paths has not been set");
+        } else if (!Files.exists(projectsPath)) {
+            throw new IOException("Project paths has been set but does not exist");
+        }
         projects.clear();
-        YamlMapping projectsYaml = Yaml.createYamlInput(path.toFile()).readYamlMapping();
+        YamlMapping projectsYaml = Yaml.createYamlInput(projectsPath.toFile()).readYamlMapping();
         for (YamlNode projectKey : projectsYaml.keys()) {
             System.out.println(projectKey);
             Project project = buildProject(nameFromKey(projectKey.toString()), projectsYaml.value(projectKey).asMapping());
@@ -74,8 +93,6 @@ public class ProjectManager {
     }
 
     private AbstractTool buildTool(String toolNameString, YamlMapping toolYaml) {
-        System.out.println("toolNameString: " + toolNameString);
-        System.out.println("endoftool");
         ToolName toolName = ToolName.valueOf(toolNameString);
         AbstractTool tool;
         ToolSettings settings = buildSettings(toolYaml);
@@ -135,6 +152,14 @@ public class ProjectManager {
         final PrintWriter writer = new PrintWriter(new FileWriter(path.toFile()));
         writer.print(projectsYaml);
         writer.close();
+    }
+
+    public void save() throws IOException {
+        if (projectsPath == null) {
+            post("Failed to save, path to projects has not been set");
+            return;
+        }
+        save(projectsPath);
     }
 
     private YamlMapping toYaml(Project project) {

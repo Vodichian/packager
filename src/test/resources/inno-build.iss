@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Guild Master"
-#define MyAppVersion "3.1.4-SNAPSHOT"
+#define MyAppVersion "1.1.1.1"
 #define MyAppPublisher "Vodichian Development"
 #define MyAppURL "https://cloud.vodichian.com"
 #define MyAppExeName "guildmaster.exe"

@@ -2,12 +2,14 @@ package com.vodichian.packager.tool;
 
 import com.vodichian.packager.PackagerException;
 import com.vodichian.packager.Utils;
+import com.vodichian.packager.projects.Project;
 import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.stage.FileChooser;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -115,10 +117,15 @@ public class ToolFactoryTest {
 
     @Test
     public void testToolViews() throws PackagerException, IOException {
-//        List<Parent> toolViews = ToolFactory.toolViews();
-//        assertNotNull(toolViews);
-//        assertEquals(ToolName.values().length, toolViews.size());
-        fail("Refactor this to use new Projects architecture");
+        Project project = new Project();
+        List<Parent> toolViews = ToolFactory.toolViews(project);
+        assertTrue(toolViews.isEmpty());
+        assertNotNull(toolViews);
+
+        project.add(new MockTool());
+        project.add(new MockTool());
+        project.add(new MockTool());
+        assertEquals(ToolFactory.toolViews(project).size(), project.getTools().size());
     }
 
     @Test
@@ -164,4 +171,27 @@ public class ToolFactoryTest {
             assertEquals(optional.get().name().get(), toolName);
         }
     }
+
+    private static class MockTool extends AbstractTool {
+
+
+        protected MockTool() {
+            this(new ToolSettings().setName(ToolName.BUILD_EXTRACTOR), null);
+        }
+
+        protected MockTool(ToolSettings settings, Executor executor) {
+            super(settings, executor);
+        }
+
+        @Override
+        protected boolean validateConfiguration(File configuration) {
+            return false;
+        }
+
+        @Override
+        protected boolean validateTool(File file) {
+            return false;
+        }
+    }
+
 }
