@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Optional;
 
@@ -88,26 +89,64 @@ public class ProjectManager {
                 project.add(tool);
             }
         }
+        postProcessBuildTool(project);
 
         return project;
+    }
+
+    /**
+     * {@link BuildToolSettings} requires special handling, so if it exists for <code>project</code>, do the
+     * post-processing here.
+     *
+     * @param project the project to post-process
+     */
+    private void postProcessBuildTool(Project project) {
+        Collection<AbstractTool> tools = project.getTools();
+        Optional<AbstractTool> buildOpt = tools.stream()
+                .filter(tool -> tool.getSettings().getName().equals(ToolName.BUILD_EXTRACTOR))
+                .findAny();
+        if (buildOpt.isPresent()) {
+            // get InnoTool
+            Optional<AbstractTool> innoOpt = tools.stream()
+                    .filter(tool -> tool.getSettings().getName().equals(ToolName.INNO_SETUP))
+                    .findAny();
+            // get LaunchTool
+            Optional<AbstractTool> launchOpt = tools.stream()
+                    .filter(tool -> tool.getSettings().getName().equals(ToolName.LAUNCH_4_J))
+                    .findAny();
+            // if have both, add to BuildTool.ToolSettings
+            if (innoOpt.isPresent() && launchOpt.isPresent()) {
+                ((BuildToolSettings) buildOpt.get().getSettings()).setInnoTool((InnoTool) innoOpt.get());
+                ((BuildToolSettings) buildOpt.get().getSettings()).setLaunchTool((Launch4jTool) launchOpt.get());
+            }
+            // else post error and return
+            post("Found a build tool without corresponding Inno or Launch tools");
+        }
     }
 
     private AbstractTool buildTool(String toolNameString, YamlMapping toolYaml) {
         ToolName toolName = ToolName.valueOf(toolNameString);
         AbstractTool tool;
-        ToolSettings settings = buildSettings(toolYaml);
-        settings.setName(toolName);
         switch (toolName) {
 
-            case INNO_SETUP:
+            case INNO_SETUP: {
+                ToolSettings settings = buildSettings(toolYaml, new ToolSettings());
+                settings.setName(toolName);
                 tool = new InnoTool(settings, new InnoExecutor());
                 break;
-            case LAUNCH_4_J:
+            }
+            case LAUNCH_4_J: {
+                ToolSettings settings = buildSettings(toolYaml, new ToolSettings());
+                settings.setName(toolName);
                 tool = new Launch4jTool(settings, new LaunchExecutor());
                 break;
-            case BUILD_EXTRACTOR:
+            }
+            case BUILD_EXTRACTOR: {
+                ToolSettings settings = buildSettings(toolYaml, new BuildToolSettings());
+                settings.setName(toolName);
                 tool = new BuildTool(settings, new BuildExecutor());
                 break;
+            }
             default: {
                 throw new RuntimeException("Unknown tool: " + toolName);
             }
@@ -115,8 +154,7 @@ public class ProjectManager {
         return tool;
     }
 
-    private ToolSettings buildSettings(YamlMapping toolYaml) {
-        ToolSettings settings = new ToolSettings();
+    private ToolSettings buildSettings(YamlMapping toolYaml, ToolSettings settings) {
 
         String toolLocationString = toolYaml.string("tool_location");
         if (toolLocationString != null) {

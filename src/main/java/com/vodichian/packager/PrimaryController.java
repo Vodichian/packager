@@ -41,13 +41,9 @@ public class PrimaryController implements CloseListener {
         makeAutoScroll(messageListView);
 
         runButton.disableProperty().bind(sequencer.readyProperty.not());
-        try {
-            sequencer.setTools(ToolFactory.tools());
-        } catch (IOException | PackagerException e) {
-            System.err.println(e.getMessage());
-            post("Failed to set tools in sequencer: " + e.getMessage());
-            throw new RuntimeException(e);
-        }
+        // TODO: 10/27/2022 review and refactor the sequencer usage with regards to new Project architecture
+//        sequencer.setTools(currentProject.getTools());
+
 
         // install ProjectsController and view
         try {

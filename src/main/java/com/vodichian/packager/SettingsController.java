@@ -1,5 +1,6 @@
 package com.vodichian.packager;
 
+import com.vodichian.packager.projects.ProjectManager;
 import com.vodichian.packager.tool.ToolFactory;
 import com.vodichian.packager.tool.ToolName;
 import com.vodichian.packager.tool.ToolSettings;
@@ -28,6 +29,7 @@ public class SettingsController implements CloseListener {
     private ChoiceBox<Boolean> enableChoiceBox;
 
     private ToolSettings settings;
+    private final ProjectManager projectManager = ProjectManager.getInstance();
 
     @FXML
     private void initialize() {
@@ -42,7 +44,7 @@ public class SettingsController implements CloseListener {
             if (file != null) {
                 settings.setToolLocation(file);
                 try {
-                    ToolFactory.save(settings);
+                    projectManager.save();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -58,7 +60,7 @@ public class SettingsController implements CloseListener {
             if (file != null) {
                 settings.setConfiguration(file);
                 try {
-                    ToolFactory.save(settings);
+                    projectManager.save();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -83,7 +85,7 @@ public class SettingsController implements CloseListener {
             }
             settings.setPriority(Integer.parseInt(text));
             try {
-                ToolFactory.save(settings);
+                projectManager.save();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -94,7 +96,7 @@ public class SettingsController implements CloseListener {
             Boolean enabled = enableChoiceBox.getSelectionModel().getSelectedItem();
             settings.setEnabled(enabled);
             try {
-                ToolFactory.save(settings);
+                projectManager.save();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

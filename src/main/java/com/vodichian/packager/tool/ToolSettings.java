@@ -3,24 +3,12 @@ package com.vodichian.packager.tool;
 import javafx.beans.property.*;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.stream.Stream;
 
 /**
  * Simple data object containing the settings required to build an {@link AbstractTool}
  * <a href="joplin://x-callback-url/openNote?id=b73e27ffe7f347edaf05848aa109a6e9">Use Cases</a>
  */
 public class ToolSettings {
-
-    private static final String NAME_TAG = "name : ";
-    private static final String TOOL_TAG = "tool : ";
-    private static final String CONFIG_TAG = "config : ";
-    private static final String PRIORITY_TAG = "priority : ";
-    private static final String ENABLED_TAG = "enabled : ";
 
     public final ObjectProperty<ToolName> nameProperty = new SimpleObjectProperty<>();
     public final ObjectProperty<File> toolLocationProperty = new SimpleObjectProperty<>();
@@ -43,41 +31,6 @@ public class ToolSettings {
         this.configurationProperty.set(configuration);
         this.priorityProperty.set(priority);
         this.enabledProperty.set(enabled);
-    }
-
-    public void save(final File file) throws IOException {
-        final PrintWriter writer = new PrintWriter(new FileWriter(file));
-        writer.println("# ToolSettings");
-        writer.printf(NAME_TAG + "%s\n", nameProperty.get());
-        writer.printf(TOOL_TAG + "%s\n", (toolLocationProperty.get() == null) ? "" : toolLocationProperty.get().getAbsolutePath());
-        writer.printf(CONFIG_TAG + "%s\n", (configurationProperty.get() == null) ? "" : configurationProperty.get().getAbsolutePath());
-        writer.printf(ENABLED_TAG + "%s\n", enabledProperty.get());
-        writer.printf(PRIORITY_TAG + "%s", priorityProperty.get());
-        writer.close();
-    }
-
-    public void load(final File file) throws IOException {
-        final Path path = file.toPath();
-        final Stream<String> lines = Files.lines(path);
-        lines.forEach(line -> {
-            if (line.contains(TOOL_TAG)) {
-                final String pathToTool = line.substring(TOOL_TAG.length());
-                toolLocationProperty.set(new File(pathToTool));
-            } else if (line.contains(CONFIG_TAG)) {
-                final String pathToConfig = line.substring(CONFIG_TAG.length());
-                configurationProperty.set(new File(pathToConfig));
-            } else if (line.contains(NAME_TAG)) {
-                ToolName extracted = ToolName.valueOf(line.substring(NAME_TAG.length()));
-                nameProperty.set(extracted);
-            } else if (line.contains(PRIORITY_TAG)) {
-                int priority = Integer.parseInt(line.substring(PRIORITY_TAG.length()));
-                priorityProperty.set(priority);
-            } else if (line.contains(ENABLED_TAG)) {
-                boolean enabled = Boolean.parseBoolean(line.substring(ENABLED_TAG.length()));
-                enabledProperty.set(enabled);
-            }
-        });
-        lines.close();
     }
 
     public ToolName getName() {

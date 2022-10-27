@@ -4,8 +4,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.testng.annotations.Test;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Random;
 
 import static org.testng.Assert.*;
@@ -21,35 +19,6 @@ public class ToolSettingsTest {
         return new File(RandomStringUtils.randomAlphabetic(10));
     }
 
-
-    @Test
-    public void saveAndLoad() throws IOException {
-        ToolSettings settings = new ToolSettings();
-        ToolName name = getRandomName();
-        File location = getRandomFile();
-        int priority = RANDOM.nextInt();
-        boolean enabled = RANDOM.nextBoolean();
-        File configuration = getRandomFile();
-        settings.setName(name)
-                .setConfiguration(configuration)
-                .setToolLocation(location)
-                .setPriority(priority)
-                .setEnabled(enabled);
-
-        File saveFile = Files.createTempFile("saveFile", ".tmp").toFile();
-        System.out.println(saveFile.getAbsolutePath());
-
-        settings.save(saveFile);
-
-        ToolSettings loadedSettings = new ToolSettings();
-        loadedSettings.load(saveFile);
-        assertEquals(loadedSettings.getName(), name);
-        assertEquals(loadedSettings.getToolLocation().getName(), location.getName());
-        assertEquals(loadedSettings.getConfiguration().getName(), configuration.getName());
-        assertEquals(loadedSettings.getPriority(), priority);
-        assertEquals(loadedSettings.getEnabled(), enabled);
-
-    }
 
     @Test
     public void testName() {
