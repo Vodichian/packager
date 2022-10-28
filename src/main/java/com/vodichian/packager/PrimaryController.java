@@ -4,6 +4,9 @@ import com.vodichian.packager.projects.Project;
 import com.vodichian.packager.projects.ProjectsController;
 import com.vodichian.packager.tool.ToolFactory;
 import com.vodichian.packager.tool.ToolMessage;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -32,7 +35,7 @@ public class PrimaryController implements CloseListener {
 
     private final Sequencer sequencer = new Sequencer();
     private Parent projectsView;
-    private Project currentProject;
+    private final ObjectProperty<Project> currentProjectProperty = new SimpleObjectProperty<>();
 
     @FXML
     private void initialize() {
@@ -70,7 +73,9 @@ public class PrimaryController implements CloseListener {
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("projects/projects.fxml"));
         projectsView = fxmlLoader.load();
         ProjectsController projectsController = fxmlLoader.getController();
-        projectsController.setPrimary(this);
+        currentProjectProperty.bind(projectsController.currentProject);
+        currentProjectProperty.addListener(projectChangeListener);
+        setProject(currentProjectProperty.get());
         if (projectsToggleButton.isSelected()) mainBorderPane.leftProperty().set(projectsView);
     }
 
@@ -92,6 +97,8 @@ public class PrimaryController implements CloseListener {
 
     @Override
     public void onClose() {
+        currentProjectProperty.unbind();
+        currentProjectProperty.removeListener(projectChangeListener);
     }
 
     @FXML
@@ -104,15 +111,19 @@ public class PrimaryController implements CloseListener {
         }
     }
 
-    public void setProject(Project project) throws PackagerException, IOException {
-        if (project == null || currentProject == project) {
+    private final ChangeListener<Project> projectChangeListener = (observableValue, p1, p2) -> {
+        Project project = (Project) ((ObjectProperty<?>) observableValue).get();
+        setProject(project);
+    };
+
+    private void setProject(Project project) {
+        toolVBox.getChildren().clear();
+        if (project == null) {
             post("setProject> was either null or unchanged");
             return;
         }
         post("Changing to project " + project.getName());
-        this.currentProject = project;
-        List<Parent> views = ToolFactory.toolViews(currentProject);
-        toolVBox.getChildren().clear();
+        List<Parent> views = ToolFactory.toolViews(project);
         toolVBox.getChildren().addAll(views);
     }
 }
