@@ -13,6 +13,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
@@ -24,6 +25,8 @@ import java.util.List;
 public class PrimaryController implements CloseListener {
     @FXML
     private VBox toolVBox;
+    @FXML
+    private TitledPane titledPane;
     @FXML
     private Button runButton;
     @FXML
@@ -125,5 +128,6 @@ public class PrimaryController implements CloseListener {
         post("Changing to project " + project.getName());
         List<Parent> views = ToolFactory.toolViews(project);
         toolVBox.getChildren().addAll(views);
+        titledPane.setText(project.getName());
     }
 }
