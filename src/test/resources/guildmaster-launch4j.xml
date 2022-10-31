@@ -28,12 +28,12 @@
     <runtimeBits>64/32</runtimeBits>
   </jre>
   <versionInfo>
-    <fileVersion>1.1.1.1</fileVersion>
-    <txtFileVersion>1.1.1.1</txtFileVersion>
+    <fileVersion>1.2.3.4</fileVersion>
+    <txtFileVersion>1.2.3.4</txtFileVersion>
     <fileDescription>Guild Master Launcher</fileDescription>
     <copyright>none</copyright>
-    <productVersion>1.1.1.1</productVersion>
-    <txtProductVersion>1.1.1.1</txtProductVersion>
+    <productVersion>1.2.3.4</productVersion>
+    <txtProductVersion>1.2.3.4</txtProductVersion>
     <productName>Guild Master</productName>
     <companyName>Vodichian</companyName>
     <internalName>Vodichian</internalName>

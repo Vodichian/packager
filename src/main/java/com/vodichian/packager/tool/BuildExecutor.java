@@ -14,23 +14,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
-import java.util.Optional;
 
 public class BuildExecutor implements Executor {
     @Override
     public void execute(ToolSettings settings, ObjectProperty<ToolState> toolState) {
         // Update version in Launch4j configuration
-        Optional<AbstractTool> optionalLaunch = ToolFactory.getTool(ToolName.LAUNCH_4_J);
-        Optional<AbstractTool> optionalInno = ToolFactory.getTool(ToolName.INNO_SETUP);
-        if (optionalLaunch.isPresent() && optionalInno.isPresent()) {
-            Launch4jTool launchTool = (Launch4jTool) optionalLaunch.get();
-            InnoTool innoTool = (InnoTool) optionalInno.get();
+        BuildToolSettings buildSettings = (BuildToolSettings) settings;
+        Launch4jTool launchTool = buildSettings.getLaunchTool();
+        InnoTool innoTool = buildSettings.getInnoTool();
+        if (launchTool != null && innoTool != null) {
             execute(settings, toolState, launchTool.getSettings(), innoTool.getSettings());
         } else {
             post("A tool was not found");
             toolState.set(ToolState.FAILURE);
         }
-
     }
 
     protected void execute(ToolSettings buildSettings, ObjectProperty<ToolState> toolState,
@@ -126,7 +123,8 @@ public class BuildExecutor implements Executor {
 
     /**
      * Inno uses <code>#define MyAppVersion "version"</code>
-     * @param line the line containing old version
+     *
+     * @param line    the line containing old version
      * @param version the updated version string
      * @return a String containing the updated version
      */

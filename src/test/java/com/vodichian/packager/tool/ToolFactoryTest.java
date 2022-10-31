@@ -1,22 +1,17 @@
 package com.vodichian.packager.tool;
 
 import com.vodichian.packager.PackagerException;
-import com.vodichian.packager.Utils;
+import com.vodichian.packager.projects.Project;
 import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.stage.FileChooser;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 import static org.testng.Assert.*;
 
@@ -29,95 +24,16 @@ public class ToolFactoryTest {
     }
 
     @Test
-    public void testMake() {
-        ToolSettings settings = new ToolSettings();
-        try {
-            settings.setName(ToolName.LAUNCH_4_J);
-            AbstractTool tool = ToolFactory.make(settings);
-            assertEquals(tool.getClass(), Launch4jTool.class);
-        } catch (PackagerException e) {
-            fail("Exception was thrown", e);
-        }
-
-        settings = new ToolSettings(ToolName.INNO_SETUP, null, null, 0, true);
-        try {
-            AbstractTool tool = ToolFactory.make(settings);
-            assertEquals(tool.getClass(), InnoTool.class);
-        } catch (PackagerException e) {
-            fail("Exception was thrown, e");
-        }
-    }
-
-    @Test
-    public void testTools() throws PackagerException, IOException {
-        // remove existing settings, if any
-        Path toolDir = Paths.get("tools");
-        try (Stream<Path> settings = Files.list(toolDir)) {
-            settings
-                    .filter(path -> !Files.isDirectory(path))
-                    .filter(path -> Utils.getExtension(path.toFile().getName())
-                            .orElse("none").equals(ToolFactory.SETTING_EXTENSION))
-                    .forEach(path1 -> {
-                        try {
-                            Files.delete(path1);
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
-        }
-        try (Stream<Path> settings = Files.list(toolDir)) {
-            long size = settings
-                    .filter(path -> !Files.isDirectory(path))
-                    .filter(path -> Utils.getExtension(path.toFile().getName())
-                            .orElse("none").equals(ToolFactory.SETTING_EXTENSION))
-                    .count();
-            assertEquals(size, 0);
-        }
-
-        ToolFactory.reset(); // need to do this because previous tests may have already created tool instances
-        // ToolFactory.tools() should now create default settings and return a collection of AbstractTool
-        Collection<AbstractTool> tools = ToolFactory.tools();
-        assertEquals(tools.size(), ToolName.values().length);
-        tools.forEach(tool -> System.out.println("Tool Found: " + tool.getSettings().getName()));
-
-        try (Stream<Path> settings = Files.list(toolDir)) {
-            long size = settings
-                    .filter(path -> !Files.isDirectory(path))
-                    .filter(path -> Utils.getExtension(path.toFile().getName())
-                            .orElse("none").equals(ToolFactory.SETTING_EXTENSION))
-                    .count();
-            assertEquals(size, ToolName.values().length, "Default settings were not correctly created");
-        }
-
-        // cleanup
-        try (Stream<Path> settings = Files.list(toolDir)) {
-            settings
-                    .filter(path -> !Files.isDirectory(path))
-                    .filter(path -> Utils.getExtension(path.toFile().getName())
-                            .orElse("none").equals(ToolFactory.SETTING_EXTENSION))
-                    .forEach(path1 -> {
-                        try {
-                            Files.delete(path1);
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
-        }
-        try (Stream<Path> settings = Files.list(toolDir)) {
-            long size = settings
-                    .filter(path -> !Files.isDirectory(path))
-                    .filter(path -> Utils.getExtension(path.toFile().getName())
-                            .orElse("none").equals(ToolFactory.SETTING_EXTENSION))
-                    .count();
-            assertEquals(size, 0);
-        }
-    }
-
-    @Test
-    public void testToolViews() throws PackagerException, IOException {
-        List<Parent> toolViews = ToolFactory.toolViews();
+    public void testToolViews() {
+        Project project = new Project();
+        List<Parent> toolViews = ToolFactory.toolViews(project);
+        assertTrue(toolViews.isEmpty());
         assertNotNull(toolViews);
-        assertEquals(ToolName.values().length, toolViews.size());
+
+        project.add(new MockTool());
+        project.add(new MockTool());
+        project.add(new MockTool());
+        assertEquals(ToolFactory.toolViews(project).size(), project.getTools().size());
     }
 
     @Test
@@ -152,15 +68,26 @@ public class ToolFactoryTest {
         assertTrue(extensionsBuild.contains("*.*"));
     }
 
-    @Test
-    public void testGetTool() throws PackagerException, IOException {
-        ToolFactory.tools(); // ensure the tools have been created
-        assertTrue(ToolName.values().length > 0);
-        for (ToolName toolName : ToolName.values()) {
-            Optional<AbstractTool> optional = ToolFactory.getTool(toolName);
-            assertNotNull(optional);
-            assertTrue(optional.isPresent());
-            assertEquals(optional.get().name().get(), toolName);
+    private static class MockTool extends AbstractTool {
+
+
+        protected MockTool() {
+            this(new ToolSettings().setName(ToolName.BUILD_EXTRACTOR), null);
+        }
+
+        protected MockTool(ToolSettings settings, Executor executor) {
+            super(settings, executor);
+        }
+
+        @Override
+        protected boolean validateConfiguration(File configuration) {
+            return false;
+        }
+
+        @Override
+        protected boolean validateTool(File file) {
+            return false;
         }
     }
+
 }

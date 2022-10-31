@@ -1,5 +1,6 @@
 package com.vodichian.packager;
 
+import com.vodichian.packager.projects.ProjectManager;
 import com.vodichian.packager.tool.ToolSettings;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -55,6 +56,11 @@ public class App extends Application {
 
     public static void main(String[] args) {
         model = new Model();
+        try {
+            ProjectManager.getInstance().load();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         launch();
     }
 
