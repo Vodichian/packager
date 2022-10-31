@@ -17,6 +17,28 @@ import java.util.Optional;
 import static java.nio.file.Files.createTempFile;
 import static org.testng.Assert.*;
 
+/**
+ * @startuml
+ * object setup
+ * object testGetLastAccessed
+ * object testLoad
+ * object testSave
+ * object buildFillVerify
+ * object testAdd
+ * object testFind
+ * object testRemove
+ * setup --> testAdd
+ * setup --> testFind
+ * setup --> testRemove
+ * testAdd --> buildFillVerify
+ * testFind --> buildFillVerify
+ * testRemove --> buildFillVerify
+ * buildFillVerify --> testSave
+ * testSave --> testLoad
+ * testLoad --> testGetLastAccessed
+ * @enduml
+ */
+
 public class ProjectManagerTest {
     private Project project1, project2, project3;
     private ToolSettings settings1, settings2, settings3, settings4, settings5;
@@ -172,7 +194,7 @@ public class ProjectManagerTest {
      * First test called, used to build the ProjectManager, fill it programmatically with projects and tools,
      * and verify the success of these steps. This data will be used by later methods.
      */
-    @Test(dependsOnMethods = {"testAdd"})
+    @Test(dependsOnMethods = {"testAdd", "testFind", "testRemove"})
     public void buildFillVerify() {
         ProjectManager pm = ProjectManager.getInstance();
         pm.clearProjects();
@@ -198,7 +220,38 @@ public class ProjectManagerTest {
         assertEquals(name, result.get().getName());
         assertEquals(pm.getProjects().size(), 1);
         result = pm.add(new Project(name));
-        assertFalse(result.isPresent());
+        assertFalse(result.isPresent(), "Project already exists, should have returned false");
+    }
+
+    @Test
+    public void testFind() {
+        ProjectManager pm = ProjectManager.getInstance();
+        pm.clearProjects();
+        pm.add(project1);
+        pm.add(project2);
+        pm.add(project3);
+
+        pm.find(project2.getName()).ifPresentOrElse(
+                project -> assertEquals(project, project2),
+                () -> fail("Did not find " + project2));
+        pm.find(project1.getName()).ifPresentOrElse(
+                project -> assertEquals(project, project1),
+                () -> fail("Did not find " + project1));
+        pm.find(project3.getName()).ifPresentOrElse(
+                project -> assertEquals(project, project3),
+                () -> fail("Did not find " + project3.getName()));
+
+        assertFalse(pm.find("non-existing").isPresent());
+    }
+
+    @Test
+    public void testRemove() {
+        ProjectManager pm = ProjectManager.getInstance();
+        pm.clearProjects();
+        pm.add(project1);
+        assertTrue(pm.getProjects().contains(project1));
+        pm.remove(project1);
+        assertFalse(pm.getProjects().contains(project1));
     }
 
     private static class MockTool extends AbstractTool {

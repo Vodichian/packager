@@ -1,6 +1,7 @@
 package com.vodichian.packager.projects;
 
 import com.amihaiemil.eoyaml.*;
+import com.vodichian.packager.PackagerException;
 import com.vodichian.packager.tool.*;
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.collections.FXCollections;
@@ -36,6 +37,10 @@ public class ProjectManager {
             INSTANCE = new ProjectManager();
         }
         return INSTANCE;
+    }
+
+    public Optional<Project> find(String name) {
+        return projects.stream().filter(project -> project.getName().equals(name)).findAny();
     }
 
     public void load(Path path) throws IOException {
@@ -198,6 +203,7 @@ public class ProjectManager {
             return;
         }
         save(projectsPath);
+        load();
     }
 
     private YamlMapping toYaml(Project project) {
@@ -254,5 +260,15 @@ public class ProjectManager {
      */
     public Optional<Project> getLastAccessed() {
         return projects.stream().max(Comparator.comparing(Project::getLastAccessed));
+    }
+
+    public Project save(Project project) throws IOException, PackagerException {
+        save();
+        Optional<Project> optional = find(project.getName());
+        if (optional.isPresent()) {
+            return optional.get();
+        } else {
+            throw new PackagerException("Failed to find saved project");
+        }
     }
 }

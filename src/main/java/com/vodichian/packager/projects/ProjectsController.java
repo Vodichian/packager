@@ -1,11 +1,15 @@
 package com.vodichian.packager.projects;
 
+import com.vodichian.packager.PackagerException;
 import com.vodichian.packager.tool.ToolMessage;
 import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.util.Callback;
 import org.greenrobot.eventbus.EventBus;
+
+import java.io.IOException;
 
 /**
  * Controller for the FXML view "projects.fxml"
@@ -29,7 +33,8 @@ public class ProjectsController {
     @FXML
     public void initialize() {
         // install MenuItems
-        newProjectMenuItem.setOnAction(actionEvent -> onNewProject());
+        newProjectMenuItem.setOnAction(this::onNewProject);
+        renameProjectMenuItem.setOnAction(this::onRenameProject);
         currentProject = projectsListView.getSelectionModel().selectedItemProperty();
 
         ProjectManager pm = ProjectManager.getInstance();
@@ -43,12 +48,36 @@ public class ProjectsController {
         EventBus.getDefault().post(new ToolMessage(getClass().getSimpleName(), message));
     }
 
-    private void onNewProject() {
+    private void onNewProject(ActionEvent actionEvent) {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("New Project");
         dialog.setContentText("Enter project's name");
         dialog.setHeaderText(null);
         dialog.showAndWait().ifPresent(this::createAndAdd);
+    }
+
+    private void onRenameProject(ActionEvent actionEvent) {
+        if (currentProject.get() == null) return;
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Rename Project");
+        dialog.setContentText("Enter new name:");
+        dialog.setHeaderText("Rename project \"" + currentProject.get().getName() + "\"");
+        dialog.showAndWait().ifPresent(this::rename);
+    }
+
+    private void rename(String name) {
+        post("Renaming \"" + currentProject.get().getName() + "\" to \"" + name + "\"");
+        Project project = currentProject.get();
+        project.setName(name);
+        try {
+            ProjectManager pm = ProjectManager.getInstance();
+            project = pm.save(project);
+            projectsListView.getSelectionModel().select(project);
+
+        } catch (IOException | PackagerException e) {
+            post("Failed to save renamed project:" + e.getMessage());
+        }
+
     }
 
     /**
