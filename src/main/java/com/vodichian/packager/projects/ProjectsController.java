@@ -5,7 +5,10 @@ import com.vodichian.packager.tool.ToolMessage;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextInputDialog;
 import javafx.util.Callback;
 import org.greenrobot.eventbus.EventBus;
 
@@ -18,11 +21,7 @@ public class ProjectsController {
     @FXML
     public ListView<Project> projectsListView;
     @FXML
-    private MenuButton operationsMenuButton;
-    @FXML
     private MenuItem newProjectMenuItem;
-    @FXML
-    private MenuItem loadProjectMenuItem;
     @FXML
     private MenuItem deleteProjectMenuItem;
     @FXML
@@ -87,9 +86,18 @@ public class ProjectsController {
      */
     private void createAndAdd(String name) {
         if (name.isBlank()) return;
+        ProjectManager pm = ProjectManager.getInstance();
 
-        ProjectManager.getInstance().add(new Project((name)))
-                .ifPresent(project -> projectsListView.getSelectionModel().select(project));
+        pm.add(new Project((name)))
+                .ifPresent(project -> {
+                    try {
+                        pm.save();
+                    } catch (IOException e) {
+                        post("Failed to save new project: " + e);
+                        throw new RuntimeException(e);
+                    }
+                    projectsListView.getSelectionModel().select(project);
+                });
     }
 
     private static class ProjectCellFactory implements Callback<ListView<Project>, ListCell<Project>> {

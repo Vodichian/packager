@@ -20,6 +20,7 @@ public class Project {
     public Project(String name) {
         this();
         this.name = name;
+        this.lastAccessed = LocalDateTime.now();
     }
 
     public String getName() {

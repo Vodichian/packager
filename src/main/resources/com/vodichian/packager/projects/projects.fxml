@@ -9,10 +9,9 @@
 
 <VBox prefHeight="200.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vodichian.packager.projects.ProjectsController">
     <ToolBar prefHeight="40.0" prefWidth="200.0">
-        <MenuButton fx:id="operationsMenuButton" mnemonicParsing="false" text="Operations">
+        <MenuButton mnemonicParsing="false" text="Operations">
             <items>
                 <MenuItem fx:id="newProjectMenuItem" mnemonicParsing="false" text="New Project" />
-                <MenuItem fx:id="loadProjectMenuItem" mnemonicParsing="false" text="Load Project" />
                 <MenuItem fx:id="renameProjectMenuItem" mnemonicParsing="false" text="Rename Project" />
                 <MenuItem fx:id="deleteProjectMenuItem" mnemonicParsing="false" text="Delete Project" />
             </items>
