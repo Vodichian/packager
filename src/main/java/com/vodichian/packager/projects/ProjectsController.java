@@ -5,10 +5,7 @@ import com.vodichian.packager.tool.ToolMessage;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.*;
 import javafx.util.Callback;
 import org.greenrobot.eventbus.EventBus;
 
@@ -34,12 +31,35 @@ public class ProjectsController {
         // install MenuItems
         newProjectMenuItem.setOnAction(this::onNewProject);
         renameProjectMenuItem.setOnAction(this::onRenameProject);
+        deleteProjectMenuItem.setOnAction(this::deleteProject);
         currentProject = projectsListView.getSelectionModel().selectedItemProperty();
 
         ProjectManager pm = ProjectManager.getInstance();
         projectsListView.setCellFactory(new ProjectCellFactory());
         projectsListView.setItems(pm.getProjects());
         pm.getLastAccessed().ifPresent(project -> projectsListView.getSelectionModel().select(project));
+    }
+
+    private void deleteProject(ActionEvent actionEvent) {
+        Project project = currentProject.get();
+        if (project == null) return;
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Delete Project");
+        alert.setHeaderText("Deleting \"" + project.getName() + "\"");
+
+        alert.setContentText("Do you really want to delete \"" + project.getName() + "\"?");
+
+        alert.showAndWait().ifPresent(buttonType -> {
+            if (buttonType == ButtonType.OK) {
+                try {
+                    ProjectManager.getInstance().remove(project);
+                } catch (IOException e) {
+                    post("Failed to delete project: " + e);
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 
     private void post(String message) {

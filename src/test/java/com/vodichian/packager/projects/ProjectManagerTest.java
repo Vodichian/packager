@@ -245,7 +245,7 @@ public class ProjectManagerTest {
     }
 
     @Test
-    public void testRemove() {
+    public void testRemove() throws IOException {
         ProjectManager pm = ProjectManager.getInstance();
         pm.clearProjects();
         pm.add(project1);

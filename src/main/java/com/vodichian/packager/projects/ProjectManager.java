@@ -247,8 +247,9 @@ public class ProjectManager {
         EventBus.getDefault().post(new ToolMessage(getClass().getSimpleName(), message));
     }
 
-    public void remove(Project project) {
+    public void remove(Project project) throws IOException {
         projects.remove(project);
+        save();
     }
 
     public ObservableList<Project> getProjects() {
