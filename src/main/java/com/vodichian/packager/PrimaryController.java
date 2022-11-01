@@ -20,6 +20,7 @@ import javafx.scene.layout.VBox;
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class PrimaryController implements CloseListener {
@@ -116,6 +117,12 @@ public class PrimaryController implements CloseListener {
 
     private final ChangeListener<Project> projectChangeListener = (observableValue, p1, p2) -> {
         Project project = (Project) ((ObjectProperty<?>) observableValue).get();
+        if (p1 != null) {
+            p1.setLastAccessed(LocalDateTime.now().minusSeconds(10));
+        }
+        if (p2 != null) {
+            p2.setLastAccessed(LocalDateTime.now());
+        }
         setProject(project);
     };
 

@@ -20,6 +20,19 @@ public class App extends Application {
 
     private static Model model;
 
+    static {
+        Runtime.getRuntime().addShutdownHook(
+                new Thread(() -> {
+                    try {
+                        ProjectManager.getInstance().saveWithoutLoad();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+        );
+    }
+
+
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("primary.fxml"));

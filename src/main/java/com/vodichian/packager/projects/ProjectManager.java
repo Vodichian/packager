@@ -206,6 +206,19 @@ public class ProjectManager {
         load();
     }
 
+    /**
+     * Saves the project without immediately loading the saved file. Intended to be used on application exit.
+     *
+     * @throws IOException if fails to save to file
+     */
+    public void saveWithoutLoad() throws IOException {
+        if (projectsPath == null) {
+            post("Failed to save, path to projects has not been set");
+            return;
+        }
+        save(projectsPath);
+    }
+
     private YamlMapping toYaml(Project project) {
         YamlMappingBuilder builder = Yaml.createYamlMappingBuilder();
         builder = builder.add("lastAccessed", project.getLastAccessed().toString());
