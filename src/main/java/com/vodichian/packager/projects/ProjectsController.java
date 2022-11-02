@@ -108,7 +108,7 @@ public class ProjectsController {
         if (name.isBlank()) return;
         ProjectManager pm = ProjectManager.getInstance();
 
-        pm.add(new Project((name)))
+        pm.newProject(name)
                 .ifPresent(project -> {
                     try {
                         pm.save();

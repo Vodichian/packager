@@ -74,7 +74,7 @@ public class ProjectManager {
     }
 
     private Project buildProject(String projectName, YamlMapping projectYaml) {
-        Project project = new Project();
+        Project project = new ProjectImpl();
         System.out.println("Projectname: " + projectName);
         project.setName(projectName);
 
@@ -242,7 +242,7 @@ public class ProjectManager {
         projects.clear();
     }
 
-    public Optional<Project> add(final Project project) {
+    protected Optional<Project> add(final Project project) {
         boolean exists = projects.stream().anyMatch(p -> p.getName().equals(project.getName()));
         Project result;
         if (exists) {
@@ -270,7 +270,7 @@ public class ProjectManager {
     }
 
     /**
-     * @return the lass accessed {@link Project}, or null if no projects have been created
+     * @return the lass accessed {@link ProjectImpl}, or null if no projects have been created
      */
     public Optional<Project> getLastAccessed() {
         return projects.stream().max(Comparator.comparing(Project::getLastAccessed));
@@ -284,5 +284,18 @@ public class ProjectManager {
         } else {
             throw new PackagerException("Failed to find saved project");
         }
+    }
+
+    /**
+     * Create a new project with the given <code>name</code>. Will fail to return a project if a project with
+     * <code>name</code> already exists.
+     *
+     * @param name the name of the project
+     * @return an {@link Optional} containing the newly created project
+     */
+    public Optional<Project> newProject(String name) {
+        Project project = new ProjectImpl();
+        project.setName(name);
+        return add(project);
     }
 }
