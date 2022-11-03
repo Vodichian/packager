@@ -3,6 +3,8 @@ package com.vodichian.packager;
 import com.vodichian.packager.projects.Project;
 import com.vodichian.packager.projects.ProjectManager;
 import com.vodichian.packager.tool.*;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
@@ -20,6 +22,8 @@ import java.util.stream.Collectors;
 public class ProjectToolsController {
 
     @FXML
+    private Button runButton;
+    @FXML
     private Label projectNameLabel;
     @FXML
     private MenuButton addToolMenuButton;
@@ -30,11 +34,17 @@ public class ProjectToolsController {
     private final ObjectProperty<Project> projectProperty = new SimpleObjectProperty<>();
     @FXML
     private Pane topPane;
+    private final Sequencer sequencer = new Sequencer();
+
 
     @FXML
     public void initialize() {
-        removeToolButton.disableProperty().bind(projectListView.getSelectionModel().selectedItemProperty().isNull());
+        BooleanBinding selectedBinding = projectListView.getSelectionModel().selectedItemProperty().isNotNull();
+        BooleanBinding hasTools = Bindings.isNotEmpty(projectListView.getItems());
+        removeToolButton.disableProperty().bind(selectedBinding.not());
         removeToolButton.setOnAction(this::onRemove);
+        runButton.disableProperty().bind(hasTools.not().or(sequencer.readyProperty.not()));
+        runButton.setOnAction(this::onRun);
         topPane.visibleProperty().bind(projectProperty.isNotNull());
         projectListView.setCellFactory(new ToolCellFactory());
         initAddToolMenuButton();
@@ -109,10 +119,20 @@ public class ProjectToolsController {
         } else {
             projectListView.getItems().clear();
             post("Setting project " + project.getName());
-            List<ToolController> views = ToolFactory.toolViews(project);
-            projectListView.getItems().addAll(views);
+            List<ToolController> controllers = ToolFactory.toolViews(project);
+            projectListView.getItems().addAll(controllers);
             projectNameLabel.setText(project.getName());
             projectProperty.set(project);
+            sequencer.setTools(controllers.stream().map(ToolController::getTool).collect(Collectors.toList()));
+        }
+    }
+
+    public void onRun(ActionEvent actionEvent) {
+        try {
+            sequencer.runSequence();
+        } catch (PackagerException e) {
+            post("Sequencer failed its run: " + e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
