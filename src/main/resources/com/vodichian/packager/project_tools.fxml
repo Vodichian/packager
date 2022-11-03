@@ -9,7 +9,7 @@
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
 
-<BorderPane fx:id="topPane" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vodichian.packager.ProjectToolsController">
+<BorderPane fx:id="topPane" maxWidth="1.7976931348623157E308" prefWidth="300.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vodichian.packager.ProjectToolsController">
    <top>
        <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
            <Label fx:id="projectNameLabel" text="Project Name" />
@@ -21,6 +21,7 @@
            </items>
          </MenuButton>
            <Button fx:id="removeToolButton" mnemonicParsing="false" prefWidth="60.0" text="Remove" />
+         <Button fx:id="runButton" mnemonicParsing="false" text="Run" />
        </ToolBar>
    </top>
    <center>

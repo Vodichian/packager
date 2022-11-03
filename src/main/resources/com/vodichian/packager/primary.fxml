@@ -23,7 +23,6 @@
         <HBox BorderPane.alignment="CENTER">
             <ToolBar prefHeight="40.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
                 <ToggleButton fx:id="projectsToggleButton" mnemonicParsing="false" text="Projects" />
-                <Button fx:id="runButton" mnemonicParsing="false" onAction="#onRun" text="Run" />
             </ToolBar>
             <ToolBar prefHeight="40.0" HBox.hgrow="NEVER">
                 <Button mnemonicParsing="false" onAction="#onExit" text="Exit" />

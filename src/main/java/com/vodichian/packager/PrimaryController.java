@@ -10,7 +10,6 @@ import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
@@ -25,15 +24,12 @@ public class PrimaryController implements CloseListener {
     @FXML
     private VBox toolVBox;
     @FXML
-    private Button runButton;
-    @FXML
     private ListView<ToolMessage> messageListView;
     @FXML
     private BorderPane mainBorderPane;
     @FXML
     private ToggleButton projectsToggleButton;
 
-    private final Sequencer sequencer = new Sequencer();
     private Parent projectsView;
     private ProjectToolsController projectToolsController;
     private final ObjectProperty<Project> currentProjectProperty = new SimpleObjectProperty<>();
@@ -43,11 +39,6 @@ public class PrimaryController implements CloseListener {
         Model model = App.getModel();
         messageListView.itemsProperty().bind(model.messages);
         makeAutoScroll(messageListView);
-
-        runButton.disableProperty().bind(sequencer.readyProperty.not());
-        // TODO: 10/27/2022 review and refactor the sequencer usage with regards to new Project architecture
-//        sequencer.setTools(currentProject.getTools());
-
 
         // install ProjectsController and view
         try {
@@ -114,15 +105,6 @@ public class PrimaryController implements CloseListener {
     }
 
     @FXML
-    public void onRun() {
-        try {
-            sequencer.runSequence();
-        } catch (PackagerException e) {
-            post("Sequencer failed its run: " + e.getMessage());
-            throw new RuntimeException(e);
-        }
-    }
-
     private final ChangeListener<Project> projectChangeListener = (observableValue, p1, p2) -> {
         Project project = (Project) ((ObjectProperty<?>) observableValue).get();
         if (p1 != null) {
