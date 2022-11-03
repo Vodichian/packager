@@ -24,7 +24,7 @@ public class App extends Application {
         Runtime.getRuntime().addShutdownHook(
                 new Thread(() -> {
                     try {
-                        ProjectManager.getInstance().saveWithoutLoad();
+                        ProjectManager.getInstance().save();
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }

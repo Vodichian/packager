@@ -119,7 +119,7 @@ public class ProjectManager {
             Optional<AbstractTool> launchOpt = tools.stream()
                     .filter(tool -> tool.getSettings().getName().equals(ToolName.LAUNCH_4_J))
                     .findAny();
-            // if have both, add to BuildTool.ToolSettings
+            // if project has both, add to BuildTool.ToolSettings
             if (innoOpt.isPresent() && launchOpt.isPresent()) {
                 ((BuildToolSettings) buildOpt.get().getSettings()).setInnoTool((InnoTool) innoOpt.get());
                 ((BuildToolSettings) buildOpt.get().getSettings()).setLaunchTool((Launch4jTool) launchOpt.get());
@@ -162,12 +162,12 @@ public class ProjectManager {
     private ToolSettings buildSettings(YamlMapping toolYaml, ToolSettings settings) {
 
         String toolLocationString = toolYaml.string("tool_location");
-        if (toolLocationString != null) {
+        if (toolLocationString != null && !toolLocationString.isEmpty()) {
             settings.setToolLocation(new File(toolLocationString));
         }
 
         String configLocationString = toolYaml.string("config_location");
-        if (configLocationString != null) {
+        if (configLocationString != null && !configLocationString.isEmpty()) {
             settings.setConfiguration(new File(configLocationString));
         }
 
@@ -203,20 +203,6 @@ public class ProjectManager {
             return;
         }
         save(projectsPath);
-        load();
-    }
-
-    /**
-     * Saves the project without immediately loading the saved file. Intended to be used on application exit.
-     *
-     * @throws IOException if fails to save to file
-     */
-    public void saveWithoutLoad() throws IOException {
-        if (projectsPath == null) {
-            post("Failed to save, path to projects has not been set");
-            return;
-        }
-        save(projectsPath);
     }
 
     private YamlMapping toYaml(Project project) {
@@ -230,9 +216,11 @@ public class ProjectManager {
     }
 
     private YamlMapping toYaml(ToolSettings settings) {
+        File toolFile = settings.getToolLocation();
+        File configFile = settings.getConfiguration();
         return Yaml.createYamlMappingBuilder()
-                .add("tool_location", settings.toolLocationProperty.get().getAbsolutePath())
-                .add("config_location", settings.configurationProperty.get().getAbsolutePath())
+                .add("tool_location", (toolFile == null) ? "" : toolFile.getAbsolutePath())
+                .add("config_location", (configFile == null) ? "" : configFile.getAbsolutePath())
                 .add("priority", String.valueOf(settings.getPriority()))
                 .add("enabled", String.valueOf(settings.getEnabled()))
                 .build();
