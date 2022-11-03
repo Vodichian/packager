@@ -24,7 +24,7 @@ public class App extends Application {
         Runtime.getRuntime().addShutdownHook(
                 new Thread(() -> {
                     try {
-                        ProjectManager.getInstance().saveWithoutLoad();
+                        ProjectManager.getInstance().save();
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -37,7 +37,7 @@ public class App extends Application {
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("primary.fxml"));
         Parent parent = fxmlLoader.load();
-        scene = new Scene(parent, 640, 480);
+        scene = new Scene(parent, 800, 480);
         stage.setScene(scene);
         currentController = fxmlLoader.getController();
         stage.show();

@@ -74,7 +74,7 @@ public class ProjectManager {
     }
 
     private Project buildProject(String projectName, YamlMapping projectYaml) {
-        Project project = new Project();
+        Project project = new ProjectImpl();
         System.out.println("Projectname: " + projectName);
         project.setName(projectName);
 
@@ -119,7 +119,7 @@ public class ProjectManager {
             Optional<AbstractTool> launchOpt = tools.stream()
                     .filter(tool -> tool.getSettings().getName().equals(ToolName.LAUNCH_4_J))
                     .findAny();
-            // if have both, add to BuildTool.ToolSettings
+            // if project has both, add to BuildTool.ToolSettings
             if (innoOpt.isPresent() && launchOpt.isPresent()) {
                 ((BuildToolSettings) buildOpt.get().getSettings()).setInnoTool((InnoTool) innoOpt.get());
                 ((BuildToolSettings) buildOpt.get().getSettings()).setLaunchTool((Launch4jTool) launchOpt.get());
@@ -162,12 +162,12 @@ public class ProjectManager {
     private ToolSettings buildSettings(YamlMapping toolYaml, ToolSettings settings) {
 
         String toolLocationString = toolYaml.string("tool_location");
-        if (toolLocationString != null) {
+        if (toolLocationString != null && !toolLocationString.isEmpty()) {
             settings.setToolLocation(new File(toolLocationString));
         }
 
         String configLocationString = toolYaml.string("config_location");
-        if (configLocationString != null) {
+        if (configLocationString != null && !configLocationString.isEmpty()) {
             settings.setConfiguration(new File(configLocationString));
         }
 
@@ -203,20 +203,6 @@ public class ProjectManager {
             return;
         }
         save(projectsPath);
-        load();
-    }
-
-    /**
-     * Saves the project without immediately loading the saved file. Intended to be used on application exit.
-     *
-     * @throws IOException if fails to save to file
-     */
-    public void saveWithoutLoad() throws IOException {
-        if (projectsPath == null) {
-            post("Failed to save, path to projects has not been set");
-            return;
-        }
-        save(projectsPath);
     }
 
     private YamlMapping toYaml(Project project) {
@@ -230,9 +216,11 @@ public class ProjectManager {
     }
 
     private YamlMapping toYaml(ToolSettings settings) {
+        File toolFile = settings.getToolLocation();
+        File configFile = settings.getConfiguration();
         return Yaml.createYamlMappingBuilder()
-                .add("tool_location", settings.toolLocationProperty.get().getAbsolutePath())
-                .add("config_location", settings.configurationProperty.get().getAbsolutePath())
+                .add("tool_location", (toolFile == null) ? "" : toolFile.getAbsolutePath())
+                .add("config_location", (configFile == null) ? "" : configFile.getAbsolutePath())
                 .add("priority", String.valueOf(settings.getPriority()))
                 .add("enabled", String.valueOf(settings.getEnabled()))
                 .build();
@@ -242,7 +230,7 @@ public class ProjectManager {
         projects.clear();
     }
 
-    public Optional<Project> add(final Project project) {
+    protected Optional<Project> add(final Project project) {
         boolean exists = projects.stream().anyMatch(p -> p.getName().equals(project.getName()));
         Project result;
         if (exists) {
@@ -270,7 +258,7 @@ public class ProjectManager {
     }
 
     /**
-     * @return the lass accessed {@link Project}, or null if no projects have been created
+     * @return the lass accessed {@link ProjectImpl}, or null if no projects have been created
      */
     public Optional<Project> getLastAccessed() {
         return projects.stream().max(Comparator.comparing(Project::getLastAccessed));
@@ -284,5 +272,18 @@ public class ProjectManager {
         } else {
             throw new PackagerException("Failed to find saved project");
         }
+    }
+
+    /**
+     * Create a new project with the given <code>name</code>. Will fail to return a project if a project with
+     * <code>name</code> already exists.
+     *
+     * @param name the name of the project
+     * @return an {@link Optional} containing the newly created project
+     */
+    public Optional<Project> newProject(String name) {
+        Project project = new ProjectImpl();
+        project.setName(name);
+        return add(project);
     }
 }

@@ -4,57 +4,23 @@ import com.vodichian.packager.tool.AbstractTool;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
-public class Project {
-    private String name;
-    private LocalDateTime lastAccessed;
-    private final Set<AbstractTool> toolSet;
+public interface Project {
+    String getName();
 
-    public Project() {
-        toolSet = new HashSet<>();
-    }
+    void setName(String name);
 
-    public Project(String name) {
-        this();
-        this.name = name;
-        this.lastAccessed = LocalDateTime.now();
-    }
+    LocalDateTime getLastAccessed();
 
-    public String getName() {
-        return name;
-    }
+    void setLastAccessed(LocalDateTime lastAccessed);
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    Collection<AbstractTool> getTools();
 
-    public LocalDateTime getLastAccessed() {
-        return lastAccessed;
-    }
+    void addAll(Collection<AbstractTool> tools);
 
-    public void setLastAccessed(LocalDateTime lastAccessed) {
-        this.lastAccessed = lastAccessed;
-    }
+    void setTools(Collection<AbstractTool> tools);
 
-    public Collection<AbstractTool> getTools() {
-        return Collections.unmodifiableCollection(toolSet);
-    }
+    Project add(AbstractTool tool);
 
-    public void addAll(Collection<AbstractTool> tools) {
-
-        toolSet.addAll(tools);
-    }
-
-    public void setTools(Collection<AbstractTool> tools) {
-        toolSet.clear();
-        toolSet.addAll(tools);
-    }
-
-    public Project add(AbstractTool tool) {
-        toolSet.add(tool);
-        return this;
-    }
+    void remove(AbstractTool tool);
 }

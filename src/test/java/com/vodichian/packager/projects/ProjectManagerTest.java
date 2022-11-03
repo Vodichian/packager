@@ -54,7 +54,7 @@ public class ProjectManagerTest {
         path = createTempFile("projects", ".tmp");
 
         // make project1
-        project1 = new Project();
+        project1 = new ProjectImpl();
         project1.setName("First Project");
         project1.setLastAccessed(LocalDateTime.now());
         settings1 = new ToolSettings()
@@ -75,7 +75,7 @@ public class ProjectManagerTest {
         project1.add(tool2);
 
         // make project2
-        project2 = new Project();
+        project2 = new ProjectImpl();
         project2.setName("Second Project");
         project2.setLastAccessed(LocalDateTime.now().minusDays(1));
         settings3 = new ToolSettings()
@@ -105,7 +105,7 @@ public class ProjectManagerTest {
 
 
         // make project3
-        project3 = new Project();
+        project3 = new ProjectImpl();
         project3.setName("Third Project");
         project3.setLastAccessed(LocalDateTime.now().minusDays(2));
         settings3 = new ToolSettings()
@@ -215,11 +215,11 @@ public class ProjectManagerTest {
         pm.clearProjects();
         assertTrue(pm.getProjects().isEmpty());
         String name = "a project";
-        Optional<Project> result = pm.add(new Project(name));
+        Optional<Project> result = pm.add(new ProjectImpl(name));
         assertTrue(result.isPresent());
         assertEquals(name, result.get().getName());
         assertEquals(pm.getProjects().size(), 1);
-        result = pm.add(new Project(name));
+        result = pm.add(new ProjectImpl(name));
         assertFalse(result.isPresent(), "Project already exists, should have returned false");
     }
 

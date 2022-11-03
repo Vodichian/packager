@@ -2,7 +2,6 @@ package com.vodichian.packager;
 
 import com.vodichian.packager.projects.Project;
 import com.vodichian.packager.projects.ProjectsController;
-import com.vodichian.packager.tool.ToolFactory;
 import com.vodichian.packager.tool.ToolMessage;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -13,21 +12,18 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
-import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.List;
 
 public class PrimaryController implements CloseListener {
     @FXML
     private VBox toolVBox;
-    @FXML
-    private TitledPane titledPane;
     @FXML
     private Button runButton;
     @FXML
@@ -39,6 +35,7 @@ public class PrimaryController implements CloseListener {
 
     private final Sequencer sequencer = new Sequencer();
     private Parent projectsView;
+    private ProjectToolsController projectToolsController;
     private final ObjectProperty<Project> currentProjectProperty = new SimpleObjectProperty<>();
 
     @FXML
@@ -56,8 +53,10 @@ public class PrimaryController implements CloseListener {
         try {
             projectsToggleButton.setSelected(true);
             installProjectsUI();
+            installProjectToolsUI();
+            setProject(currentProjectProperty.get());
         } catch (IOException e) {
-            post("Failed to install Projects UI: " + e.getMessage());
+            post("Failed to install UI element(s): " + e.getMessage());
             throw new RuntimeException(e);
         }
 
@@ -65,11 +64,21 @@ public class PrimaryController implements CloseListener {
                 .addListener(observable -> toggleProjects(projectsToggleButton.isSelected()));
     }
 
+    private void installProjectToolsUI() throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("project_tools.fxml"));
+        Parent projectToolsView = fxmlLoader.load();
+        projectToolsController = fxmlLoader.getController();
+        toolVBox.getChildren().add(projectToolsView);
+    }
+
     private void toggleProjects(boolean selected) {
+        Stage stage = (Stage) toolVBox.getScene().getWindow();
         if (!selected) {
             mainBorderPane.leftProperty().set(null);
+            stage.setWidth(640);
         } else {
             mainBorderPane.leftProperty().set(projectsView);
+            stage.setWidth(800);
         }
     }
 
@@ -79,7 +88,6 @@ public class PrimaryController implements CloseListener {
         ProjectsController projectsController = fxmlLoader.getController();
         currentProjectProperty.bind(projectsController.currentProject);
         currentProjectProperty.addListener(projectChangeListener);
-        setProject(currentProjectProperty.get());
         if (projectsToggleButton.isSelected()) mainBorderPane.leftProperty().set(projectsView);
     }
 
@@ -127,14 +135,6 @@ public class PrimaryController implements CloseListener {
     };
 
     private void setProject(Project project) {
-        toolVBox.getChildren().clear();
-        if (project == null) {
-            post("setProject> was either null or unchanged");
-            return;
-        }
-        post("Changing to project " + project.getName());
-        List<Parent> views = ToolFactory.toolViews(project);
-        toolVBox.getChildren().addAll(views);
-        titledPane.setText(project.getName());
+        projectToolsController.setProject(project);
     }
 }
