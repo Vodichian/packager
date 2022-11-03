@@ -74,8 +74,12 @@ public class ProjectToolsController {
                     project.add(new BuildTool(new ToolSettings().setName(toolName), new BuildExecutor()));
                     break;
             }
+            update();
         }
+    }
 
+    private void update() {
+        setProject(projectProperty.get());
     }
 
     private void onRemove(ActionEvent actionEvent) {
@@ -87,7 +91,7 @@ public class ProjectToolsController {
             projectProperty.set(null);
         } else {
             toolVBox.getChildren().clear();
-            post("Changing to project " + project.getName());
+            post("Setting project " + project.getName());
             List<Parent> views = ToolFactory.toolViews(project);
             toolVBox.getChildren().addAll(views);
             projectNameLabel.setText(project.getName());
