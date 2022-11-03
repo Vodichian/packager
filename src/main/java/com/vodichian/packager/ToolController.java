@@ -4,9 +4,11 @@ import com.vodichian.packager.tool.AbstractTool;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Sphere;
+import javafx.util.Duration;
 
 import java.io.IOException;
 
@@ -51,6 +53,18 @@ public class ToolController {
         setSphereColor(toolSphere, Color.RED);
         setSphereColor(configSphere, Color.RED);
         setSphereColor(enabledSphere, Color.RED);
+
+        Tooltip enableToolTip = new Tooltip("Tool Enable");
+        enableToolTip.setShowDelay(Duration.millis(2));
+        Tooltip.install(enabledSphere, enableToolTip);
+
+        Tooltip toolToolTip = new Tooltip("Tool location");
+        toolToolTip.setShowDelay(Duration.millis(2));
+        Tooltip.install(toolSphere, toolToolTip);
+
+        Tooltip configToolTip = new Tooltip("Tool configuration");
+        configToolTip.setShowDelay(Duration.millis(2));
+        Tooltip.install(configSphere, configToolTip);
     }
 
     public void setTool(AbstractTool tool) {
