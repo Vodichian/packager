@@ -15,6 +15,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.IOException;
@@ -34,7 +35,6 @@ public class PrimaryController implements CloseListener {
 
     private final Sequencer sequencer = new Sequencer();
     private Parent projectsView;
-    private Parent projectToolsView;
     private ProjectToolsController projectToolsController;
     private final ObjectProperty<Project> currentProjectProperty = new SimpleObjectProperty<>();
 
@@ -60,23 +60,25 @@ public class PrimaryController implements CloseListener {
             throw new RuntimeException(e);
         }
 
-
         projectsToggleButton.selectedProperty()
                 .addListener(observable -> toggleProjects(projectsToggleButton.isSelected()));
     }
 
     private void installProjectToolsUI() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("project_tools.fxml"));
-        projectToolsView = fxmlLoader.load();
+        Parent projectToolsView = fxmlLoader.load();
         projectToolsController = fxmlLoader.getController();
         toolVBox.getChildren().add(projectToolsView);
     }
 
     private void toggleProjects(boolean selected) {
+        Stage stage = (Stage) toolVBox.getScene().getWindow();
         if (!selected) {
             mainBorderPane.leftProperty().set(null);
+            stage.setWidth(640);
         } else {
             mainBorderPane.leftProperty().set(projectsView);
+            stage.setWidth(800);
         }
     }
 

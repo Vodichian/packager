@@ -1,20 +1,18 @@
 package com.vodichian.packager;
 
 import com.vodichian.packager.projects.Project;
+import com.vodichian.packager.projects.ProjectManager;
 import com.vodichian.packager.tool.*;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.util.Callback;
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,15 +26,17 @@ public class ProjectToolsController {
     @FXML
     private Button removeToolButton;
     @FXML
-    private VBox toolVBox;
+    private ListView<ToolController> projectListView;
     private final ObjectProperty<Project> projectProperty = new SimpleObjectProperty<>();
     @FXML
     private Pane topPane;
 
     @FXML
     public void initialize() {
+        removeToolButton.disableProperty().bind(projectListView.getSelectionModel().selectedItemProperty().isNull());
         removeToolButton.setOnAction(this::onRemove);
         topPane.visibleProperty().bind(projectProperty.isNotNull());
+        projectListView.setCellFactory(new ToolCellFactory());
         initAddToolMenuButton();
     }
 
@@ -83,17 +83,34 @@ public class ProjectToolsController {
     }
 
     private void onRemove(ActionEvent actionEvent) {
-        System.out.println("onRemove called");
+        AbstractTool toolToRemove = projectListView.getSelectionModel().getSelectedItem().getTool();
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setContentText("Remove \"" + toolToRemove.getSettings().getName() + "\" from this project?");
+        alert.setHeaderText("Confirm tool removal");
+        alert.setTitle("Remove tool");
+        alert.showAndWait().ifPresent(buttonType -> {
+            if (buttonType == ButtonType.OK) {
+                post("Removing " + toolToRemove.getSettings().getName() + " from the project");
+                projectProperty.get().remove(toolToRemove);
+                try {
+                    ProjectManager.getInstance().save();
+                    update();
+                } catch (IOException e) {
+                    post("Save failed: " + e.getMessage());
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 
     public void setProject(Project project) {
         if (project == null) {
             projectProperty.set(null);
         } else {
-            toolVBox.getChildren().clear();
+            projectListView.getItems().clear();
             post("Setting project " + project.getName());
-            List<Parent> views = ToolFactory.toolViews(project);
-            toolVBox.getChildren().addAll(views);
+            List<ToolController> views = ToolFactory.toolViews(project);
+            projectListView.getItems().addAll(views);
             projectNameLabel.setText(project.getName());
             projectProperty.set(project);
         }
@@ -103,4 +120,24 @@ public class ProjectToolsController {
         System.out.println(getClass().getSimpleName() + "> " + message);
         EventBus.getDefault().post(new ToolMessage(getClass().getSimpleName(), message));
     }
+
+    private static class ToolCellFactory implements Callback<ListView<ToolController>, ListCell<ToolController>> {
+        @Override
+        public ListCell<ToolController> call(ListView<ToolController> projectListView) {
+            return new ListCell<>() {
+                @Override
+                public void updateItem(ToolController controller, boolean empty) {
+                    super.updateItem(controller, empty);
+                    if (empty || controller == null) {
+                        setText(null);
+                        setGraphic(null);
+                    } else {
+                        setText(null);
+                        setGraphic(controller.getParent());
+                    }
+                }
+            };
+        }
+    }
+
 }

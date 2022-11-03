@@ -21,4 +21,6 @@ public interface Project {
     void setTools(Collection<AbstractTool> tools);
 
     Project add(AbstractTool tool);
+
+    void remove(AbstractTool tool);
 }

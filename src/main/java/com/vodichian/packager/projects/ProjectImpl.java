@@ -65,4 +65,9 @@ class ProjectImpl implements Project {
         toolSet.add(tool);
         return this;
     }
+
+    @Override
+    public void remove(AbstractTool tool) {
+        toolSet.remove(tool);
+    }
 }

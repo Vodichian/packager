@@ -2,6 +2,7 @@ package com.vodichian.packager;
 
 import com.vodichian.packager.tool.AbstractTool;
 import javafx.fxml.FXML;
+import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
@@ -40,6 +41,7 @@ public class ToolController {
      */
     @FXML
     private Sphere enabledSphere;
+    private Parent parent;
 
     /**
      * The view this controller is controlling
@@ -56,6 +58,10 @@ public class ToolController {
         this.priorityLabel.setText(String.valueOf(tool.getSettings().getPriority()));
         nameLabel.setText(tool.getSettings().getName().toString());
         monitorToolStatus();
+    }
+
+    public AbstractTool getTool() {
+        return tool;
     }
 
     @FXML
@@ -104,4 +110,11 @@ public class ToolController {
         sphere.setMaterial(material);
     }
 
+    public void setParent(Parent parent) {
+        this.parent = parent;
+    }
+
+    public Parent getParent() {
+        return parent;
+    }
 }

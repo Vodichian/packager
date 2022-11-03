@@ -1,6 +1,7 @@
 package com.vodichian.packager.tool;
 
 import com.vodichian.packager.PackagerException;
+import com.vodichian.packager.ToolController;
 import com.vodichian.packager.projects.Project;
 import com.vodichian.packager.projects.ProjectManager;
 import javafx.application.Platform;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.testng.Assert.*;
 
@@ -30,7 +32,7 @@ public class ToolFactoryTest {
         Optional<Project> optional = ProjectManager.getInstance().newProject("project name");
         if(optional.isEmpty()) fail("Project should have been created");
         Project project = optional.get();
-        List<Parent> toolViews = ToolFactory.toolViews(project);
+        List<Parent> toolViews = ToolFactory.toolViews(project).stream().map(ToolController::getParent).collect(Collectors.toList());
         assertTrue(toolViews.isEmpty());
         assertNotNull(toolViews);
 

@@ -24,15 +24,16 @@ public class ToolFactory {
     private static final FileChooser.ExtensionFilter XML_EXT = new FileChooser.ExtensionFilter("XML Files", "*.xml");
     private static final Collection<FileChooser.ExtensionFilter> XML_ALL_FILTERS = Arrays.asList(XML_EXT, ALL_EXT);
 
-    private static Parent loadFXML(AbstractTool tool) throws IOException {
+    private static ToolController loadFXML(AbstractTool tool) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("tool.fxml"));
         Parent parent = fxmlLoader.load();
         ToolController controller = fxmlLoader.getController();
         controller.setTool(tool);
-        return parent;
+        controller.setParent(parent);
+        return controller;
     }
 
-    public static List<Parent> toolViews(Project project) {
+    public static List<ToolController> toolViews(Project project) {
         return project.getTools().stream()
                 // reverse order sorting by flipping o2 and o1
                 .sorted((o1, o2) -> Integer.compare(o2.getSettings().getPriority(), o1.getSettings().getPriority()))
