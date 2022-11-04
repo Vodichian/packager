@@ -14,7 +14,7 @@
     <groupId>com.vodichian</groupId>
     <artifactId>guild</artifactId>
     <packaging>pom</packaging>
-    <version>2.1</version>
+    <version>1.2.3.4</version>
     <modules>
         <module>guild-server</module>
         <module>guild-client</module>
