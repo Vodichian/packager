@@ -27,6 +27,8 @@ public class SettingsController implements CloseListener {
     private TextField priorityTextField;
     @FXML
     private ChoiceBox<Boolean> enableChoiceBox;
+    @FXML
+    private TextArea contextTextArea;
 
     private ToolSettings settings;
     private final ProjectManager projectManager = ProjectManager.getInstance();
@@ -118,11 +120,23 @@ public class SettingsController implements CloseListener {
             nameLabel.setText(ToolName.BUILD_EXTRACTOR.name() + " Settings");
             toolTextField.setDisable(true);
             toolButton.setDisable(true);
+            contextTextArea.setText("" +
+                    "* Tool field is not used\n" +
+                    "* Config field requires the pom.xml for the java project\n" +
+                    "* Priority determines which tools is run first, larger numbers are higher priority\n" +
+                    "* \"Enabled\" toggles the enable for this tool\n"
+            );
         } else {
             toolTextField.setDisable(false);
             configTextField.setDisable(false);
             toolButton.setDisable(false);
             nameLabel.setText(settings.getName() + " Settings");
+            contextTextArea.setText("" +
+                    "* Tool field requires the location of the tool's executable\n" +
+                    "* Config field requires location of the tool's configuration file\n" +
+                    "* Priority determines which tools is run first, larger numbers are higher priority\n" +
+                    "* \"Enabled\" toggles the enable for this tool\n"
+            );
             File toolFile = settings.getToolLocation();
             if (toolFile != null) {
                 toolTextField.setText(settings.getToolLocation().getAbsolutePath());

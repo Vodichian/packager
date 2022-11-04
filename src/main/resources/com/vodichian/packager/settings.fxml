@@ -31,7 +31,7 @@
                     <Font size="18.0" />
                 </font>
             </Label>
-         <TextArea editable="false" prefHeight="100.0" prefWidth="200.0" text="Overview of settings for this tool goes here.">
+         <TextArea fx:id="contextTextArea" editable="false" prefHeight="100.0" prefWidth="200.0" text="Overview of settings for this tool goes here.">
             <VBox.margin>
                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
             </VBox.margin>
