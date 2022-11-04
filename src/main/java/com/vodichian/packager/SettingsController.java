@@ -117,9 +117,11 @@ public class SettingsController implements CloseListener {
         if (settings.getName().equals(ToolName.BUILD_EXTRACTOR)) {
             nameLabel.setText(ToolName.BUILD_EXTRACTOR.name() + " Settings");
             toolTextField.setDisable(true);
+            toolButton.setDisable(true);
         } else {
             toolTextField.setDisable(false);
             configTextField.setDisable(false);
+            toolButton.setDisable(false);
             nameLabel.setText(settings.getName() + " Settings");
             File toolFile = settings.getToolLocation();
             if (toolFile != null) {
