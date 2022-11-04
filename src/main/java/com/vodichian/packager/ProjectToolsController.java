@@ -81,7 +81,7 @@ public class ProjectToolsController {
                     project.add(new Launch4jTool(new ToolSettings().setName(toolName), new LaunchExecutor()));
                     break;
                 case BUILD_EXTRACTOR:
-                    project.add(new BuildTool(new ToolSettings().setName(toolName), new BuildExecutor()));
+                    project.add(new BuildTool(new BuildToolSettings().setName(toolName), new BuildExecutor()));
                     break;
             }
             update();

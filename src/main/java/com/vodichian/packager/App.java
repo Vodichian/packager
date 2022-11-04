@@ -15,6 +15,7 @@ import java.io.IOException;
  */
 public class App extends Application {
 
+    private final static String APP_ICON = "packager.jpg";
     private static Scene scene;
     private static CloseListener currentController;
 
@@ -40,6 +41,10 @@ public class App extends Application {
         scene = new Scene(parent, 800, 480);
         stage.setScene(scene);
         currentController = fxmlLoader.getController();
+        javafx.scene.image.Image icon = new javafx.scene.image.Image(APP_ICON);
+        stage.getIcons().add(icon);
+        stage.setTitle("Packager");
+
         stage.show();
     }
 
