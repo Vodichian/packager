@@ -11,6 +11,7 @@ import org.greenrobot.eventbus.EventBus;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -32,6 +33,7 @@ public class Sequencer {
      */
     public final ReadOnlyObjectProperty<AbstractTool> currentlyExecutingProperty = currentlyExecutingPropertyWrapper.getReadOnlyProperty();
     private final BooleanProperty runningProperty = new SimpleBooleanProperty(false);
+    private AbstractTool finalToolExecuted;
 
     public void setTools(Collection<AbstractTool> toolCollection) {
         // check and monitor ToolState of each tool and set readyPropertyWrapper accordingly
@@ -59,6 +61,7 @@ public class Sequencer {
             throw new PackagerException("The sequencer is not ready");
         }
         runningProperty.set(true);
+        finalToolExecuted = null;
         // order according to priority
         List<AbstractTool> validAndSorted = tools.stream()
                 .filter(tool -> tool.getSettings().enabledProperty.get())
@@ -80,6 +83,7 @@ public class Sequencer {
 
         }
         runningProperty.set(false);
+        finalToolExecuted = currentlyExecutingProperty.get();
         currentlyExecutingPropertyWrapper.set(null);
     }
 
@@ -93,5 +97,9 @@ public class Sequencer {
     private void post(String message) {
         System.out.println(getClass().getSimpleName() + "> " + message);
         EventBus.getDefault().post(new ToolMessage(getClass().getSimpleName(), message));
+    }
+
+    public Optional<AbstractTool> getFinalExecuted() {
+        return Optional.ofNullable(finalToolExecuted);
     }
 }

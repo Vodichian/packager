@@ -4,7 +4,8 @@ module com.vodichian.packager {
     requires eventbus.java;
     requires maven.model; // extracts version from pom.xml
     requires plexus.utils;
-    requires com.amihaiemil.eoyaml; // required for maven-model
+    requires com.amihaiemil.eoyaml;
+    requires java.desktop; // required for maven-model
 
     opens com.vodichian.packager to javafx.fxml;
     exports com.vodichian.packager;
