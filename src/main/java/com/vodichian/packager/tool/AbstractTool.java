@@ -92,4 +92,8 @@ public abstract class AbstractTool {
         return settings;
     }
 
+    public Executor getExecutor() {
+        return executor;
+    }
+
 }
