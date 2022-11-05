@@ -96,4 +96,7 @@ public abstract class AbstractTool {
         return executor;
     }
 
+    public void openOutputDir() {
+        post("This tool does not support opening an output directory");
+    }
 }

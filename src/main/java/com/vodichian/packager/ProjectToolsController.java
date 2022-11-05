@@ -132,6 +132,7 @@ public class ProjectToolsController {
     public void onRun(ActionEvent actionEvent) {
         try {
             sequencer.runSequence();
+            sequencer.getFinalExecuted().ifPresent(AbstractTool::openOutputDir);
         } catch (PackagerException e) {
             post("Sequencer failed its run: " + e.getMessage());
             throw new RuntimeException(e);
