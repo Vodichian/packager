@@ -1,11 +1,25 @@
 package com.vodichian.packager.tool;
 
+import com.vodichian.packager.PackagerException;
+import javafx.beans.Observable;
+
 import java.io.File;
 import java.nio.file.Files;
 
 public class BuildTool extends AbstractTool {
-    public BuildTool(ToolSettings settings, Executor executor) {
+    public BuildTool(BuildToolSettings settings, Executor executor) {
         super(settings, executor);
+        settings.configurationProperty.addListener(this::postVersion);
+    }
+
+    private void postVersion(Observable observable) {
+        try {
+            String version = ((BuildExecutor) getExecutor()).getVersion(getSettings());
+            post("Project version found: " + version);
+        } catch (PackagerException e) {
+            post("Failed to extract version: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 
     /**

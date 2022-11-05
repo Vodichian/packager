@@ -149,7 +149,7 @@ public class ProjectManager {
             case BUILD_EXTRACTOR: {
                 ToolSettings settings = buildSettings(toolYaml, new BuildToolSettings());
                 settings.setName(toolName);
-                tool = new BuildTool(settings, new BuildExecutor());
+                tool = new BuildTool((BuildToolSettings) settings, new BuildExecutor());
                 break;
             }
             default: {

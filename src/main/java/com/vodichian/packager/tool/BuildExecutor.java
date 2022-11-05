@@ -245,11 +245,11 @@ public class BuildExecutor implements Executor {
     /**
      * Extract the version information from the pom.xml file provided in {@link ToolSettings#getConfiguration()}
      *
-     * @param buildSettings the {@link ToolSettings} to extact the version info from
+     * @param buildSettings the {@link ToolSettings} to extract the version info from
      * @return the extracted version information
      * @throws PackagerException if file can't be opened or an XML error occurs during parse
      */
-    private String getVersion(ToolSettings buildSettings) throws PackagerException {
+    public String getVersion(ToolSettings buildSettings) throws PackagerException {
         MavenXpp3Reader reader = new MavenXpp3Reader();
         try {
             Model model = reader.read(new FileReader(buildSettings.getConfiguration()));
